@@ -84,9 +84,7 @@ subscribe to a value and apply any actions as a result of it asynchronously.
 
 1. Subscribe to a value from Evolv.
 ```swift
-client.subscribe(<key_for_value>, <default_value>, value -> {
-Your code...
-})
+client?.subscribe(key: <key_for_value>, defaultValue: <default_value>, function: <closure>)
 ```
 
 *Note: The return value's type is decided by the provided default value's type. If there is an issue retrieving the
@@ -103,14 +101,14 @@ thats important to record is a "conversion" event. If you implemented the SDK in
 
 1. Emit a custom event.
 ```swift
-client.emitEvent(<event_type>)
+client.emitEvent(key: <event_type>)
 ```
 
 AND / OR
 
 2. Emit a custom event with an associated score.
 ```swift
-client.emitEvent(<event_type>, <score>)
+client.emitEvent(key: <event_type>, score: <score>)
 ```
 
 ### Contaminate the Allocation (optional)
@@ -130,10 +128,11 @@ implementing the EvolvAllocationStore interface. You can supply the custom alloc
 1. Supply the allocation store to the client.
 ```swift
 let config: EvolvConfig = EvolvConfig.Builder(eid: <environment_id>)
-.setEvolvAllocationStore(<custom_store>)
+.setEvolvAllocationStore(allocationStore: <custom_store>)
 .build()
 
-let client: EvolvClient = EvolvClient.init(config)
+let client: EvolvClientProtocol = EvolvClientImpl(<config>, <eventEmitter>, <futureAllocations>, <previousAllocations>, <participant>)
+
 ```
 
 

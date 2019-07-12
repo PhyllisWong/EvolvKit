@@ -49,7 +49,7 @@ class Execution<T> {
     if alreadyExecuted.isEmpty || alreadyExecuted == activeExperiements {
       
       // there was a change to the allocations after reconciliation, apply changes
-      closure(optionalValue as Any)
+      closure(value as Any)
     }
     alreadyExecuted = activeExperiements
   }
