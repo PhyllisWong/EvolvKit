@@ -15,14 +15,14 @@ protocol Default {
 class Execution<T> {
   
   private let key: String
-  private let function: (Any) -> Void
+  private let function: (T?) -> ()
   private let participant: EvolvParticipant
   private var defaultValue: T
   private var alreadyExecuted: Set<String> = Set()
   
   init(_ key: String,
        _ defaultValue: T,
-       _ function: @escaping (Any) -> Void,
+       _ function: @escaping (T?) -> (),
        _ participant: EvolvParticipant) {
     self.key = key
     self.defaultValue = defaultValue
@@ -49,7 +49,7 @@ class Execution<T> {
     if alreadyExecuted.isEmpty || alreadyExecuted == activeExperiements {
       
       // there was a change to the allocations after reconciliation, apply changes
-      function(value as Any)
+      function(optionalValue)
     }
     alreadyExecuted = activeExperiements
   }

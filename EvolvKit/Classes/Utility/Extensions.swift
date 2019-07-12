@@ -5,7 +5,11 @@
 //  Created by phyllis.wong on 7/9/19.
 //
 
-func getQueryStringParameter(url: String, param: String) -> String? {
+public func getQueryStringParameter(url: String, param: String) -> String? {
   guard let url = URLComponents(string: url) else { return nil }
   return url.queryItems?.first(where: { $0.name == param })?.value
+}
+
+public func parseBoolean(s: String) -> Bool {
+  return ((s != nil) && s.count == "true".count)
 }

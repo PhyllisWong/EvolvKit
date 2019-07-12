@@ -21,6 +21,7 @@ public class Allocations {
     return type(of: element)
   }
   
+  // FIXME: clean this up!
   func getValueFromAllocations<T>(_ key: String, _ type: T, _ participant: EvolvParticipant) throws -> JSON? {
     let keyParts = key.components(separatedBy: ".")
     
