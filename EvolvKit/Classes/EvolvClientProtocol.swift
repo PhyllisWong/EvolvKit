@@ -40,7 +40,7 @@ public protocol EvolvClientProtocol {
    - <T>: type of value to be returned
    - Returns: a value associated with the given key
    */
-  func subscribe<T>(key: String, defaultValue: Any, function: @escaping (T?) -> ())
+  func subscribe(key: String, defaultValue: Any, function: @escaping (Any) -> ())
   
   
   /**

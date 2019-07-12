@@ -30,10 +30,8 @@ public class Allocations {
     }
     
     for a in self.allocations {
-      print("A: \(a)")
       let genome = a["genome"]
       let element = try getElementFromGenome(genome: genome, keyParts: keyParts)
-      print("element: \(element)")
       if element.error == nil {
         return element
       } else {
