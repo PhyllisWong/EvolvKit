@@ -18,12 +18,12 @@ class Execution<T> {
   private let participant: EvolvParticipant
   private var defaultValue: T
   private var alreadyExecuted: Set<String> = Set()
-  private var closure : (Any) -> ()
+  private var closure : (T) -> ()
   
   init(_ key: String,
        _ defaultValue: T,
        _ participant: EvolvParticipant,
-       _ closure: @escaping (Any) -> ()) {
+       _ closure: @escaping (T) -> ()) {
     self.key = key
     self.defaultValue = defaultValue
     self.participant = participant
@@ -45,11 +45,16 @@ class Execution<T> {
       throw EvolvKeyError.errorMessage
     }
     
+    
+    guard let genericValue = value.rawValue as? T else {
+      throw EvolvKeyError.mismatchTypes
+    }
+    
     let activeExperiements = allocations.getActiveExperiments()
     if alreadyExecuted.isEmpty || alreadyExecuted == activeExperiements {
       
       // there was a change to the allocations after reconciliation, apply changes
-      closure(value as Any)
+      closure(genericValue)
     }
     alreadyExecuted = activeExperiements
   }

@@ -78,7 +78,7 @@ public class EvolvClientImpl : EvolvClientProtocol {
     return value
   }
   
-  public func subscribe(key: String, defaultValue: Any, function: @escaping (Any) -> ()) {
+  public func subscribe<T>(key: String, defaultValue: T, function: @escaping (T) -> ()) {
     // let execution = Execution(key, defaultValue, function, participant)
     let execution = Execution(key, defaultValue, participant, function)
     let previousAlloc = self.store.get(uid: self.participant.getUserId())
@@ -88,7 +88,7 @@ public class EvolvClientImpl : EvolvClientProtocol {
       do {
         try execution.executeWithAllocation(rawAllocations: prevJSON)
       } catch {
-        let message = "Unable to retrieve the value of \(key) from the allocation."
+        let message = "Error from \(key). Error message: \(error.localizedDescription)."
         LOGGER.log(.error, message: message)
         execution.executeWithDefault()
       }

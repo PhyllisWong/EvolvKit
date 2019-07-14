@@ -20,6 +20,9 @@ extension NetworkingError: LocalizedError {
 
 enum EvolvKeyError: String, Error {
   case errorMessage
+  case elementFails = "Element Fails"
+  case genomeEmpty = "Genome Empty"
+  case mismatchTypes = "Mismatched Types"
 }
 
 extension EvolvKeyError: LocalizedError {

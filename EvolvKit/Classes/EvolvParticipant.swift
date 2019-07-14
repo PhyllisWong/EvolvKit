@@ -13,7 +13,7 @@ public class EvolvParticipant {
   private var userId: String
   private var userAttributes: [String : String]
   
-  fileprivate init(userId: String, sessionId: String, userAttributes: [String: String]) {
+  init(userId: String, sessionId: String, userAttributes: [String: String]) {
     self.userId = userId
     self.sessionId = sessionId
     self.userAttributes = userAttributes
