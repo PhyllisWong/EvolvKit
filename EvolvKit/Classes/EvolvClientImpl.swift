@@ -79,10 +79,9 @@ public class EvolvClientImpl : EvolvClientProtocol {
   }
   
   public func subscribe<T>(key: String, defaultValue: T, function: @escaping (T) -> ()) {
-    // let execution = Execution(key, defaultValue, function, participant)
     let execution = Execution(key, defaultValue, participant, function)
     let previousAlloc = self.store.get(uid: self.participant.getUserId())
-    print("previousAlloc: \(String(describing: previousAlloc))")
+    
     if let prevAlloc = previousAlloc {
       let prevJSON = prevAlloc
       do {
