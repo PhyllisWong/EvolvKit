@@ -8,14 +8,14 @@
 
 import SwiftyJSON
 
-public class ExecutionQueue {
+public class ExecutionQueue<T> {
   private let LOGGER = Log.logger
-  private var queue = LinkedQueue<Execution<Any>>()
+  private var queue = LinkedQueue<Execution<T>>()
   
   init () {}
   
-  func enqueue(execution: Execution<Any>) {
-    self.queue.add((execution as! Execution<Any>))
+  func enqueue<T>(execution: Execution<T>) {
+    self.queue.add(execution as! T)
   }
   
   func executeAllWithValuesFromAllocations(allocations: [JSON]) throws {

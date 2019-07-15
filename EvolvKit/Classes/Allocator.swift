@@ -74,7 +74,8 @@ public class Allocator {
         
         if let prevAlloc = previous {
           if Allocator.allocationsNotEmpty(allocations: previous) {
-            allocations = Allocations.reconcileAllocations(previousAllocations: prevAlloc, currentAllocations: allocations)
+            allocations = Allocations.reconcileAllocations(previousAllocations: prevAlloc,
+                                                           currentAllocations: allocations)
           }
         }
         
@@ -92,7 +93,7 @@ public class Allocator {
         do {
           try self.executionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
         } catch let err {
-          self.resolveAllocationsFailure()
+          _ = self.resolveAllocationsFailure()
           let message = "There was an error executing with allocations. \(err.localizedDescription)"
           self.LOGGER.log(.error, message: message)
         }

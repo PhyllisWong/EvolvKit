@@ -95,7 +95,7 @@ public class EvolvClientImpl : EvolvClientProtocol {
     
     let allocationStatus = allocator.getAllocationStatus()
     if allocationStatus == Allocator.AllocationStatus.FETCHING {
-      // 1. enqueue the execution
+      executionQueue.enqueue(execution: execution)
       return
     } else if allocationStatus == Allocator.AllocationStatus.RETRIEVED {
       let alloc = store.get(uid: self.participant.getUserId())

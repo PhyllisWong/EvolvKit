@@ -20,8 +20,7 @@ public class Allocations {
   func getMyType<T>(_ element: T) -> Any? {
     return type(of: element)
   }
-  
-  // FIXME: clean this up!
+
   func getValueFromAllocations<T>(_ key: String, _ type: T, _ participant: EvolvParticipant) throws -> JSON? {
     let keyParts = key.components(separatedBy: ".")
     
@@ -57,7 +56,6 @@ public class Allocations {
         LOGGER.log(.error, message: "Element fails")
       }
     }
-    print("element: \(element)")
     return element
   }
   
