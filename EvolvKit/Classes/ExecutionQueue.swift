@@ -15,7 +15,7 @@ public class ExecutionQueue {
   init () {}
   
   func enqueue(execution: Execution<Any>) {
-    self.queue.add(execution)
+    self.queue.add((execution as! Execution<Any>))
   }
   
   func executeAllWithValuesFromAllocations(allocations: [JSON]) throws {
@@ -24,11 +24,12 @@ public class ExecutionQueue {
       
       do {
         try execution.executeWithAllocation(rawAllocations: allocations)
-      } catch {
+      } catch let err {
         let message = "There was an error retrieving the value of " +
-          "\(execution.getKey()) from the allocation."
+          "\(execution.getKey()) from the allocation. \(err.localizedDescription)"
         LOGGER.log(.debug, message: message)
         execution.executeWithDefault()
+        throw EvolvKeyError.keyError
       }
     }
   }

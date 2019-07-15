@@ -70,10 +70,8 @@ public class Allocator {
       
       let _ = self.httpClient.get(url: url).done { (stringJSON) in
         var allocations = JSON.init(parseJSON: stringJSON).arrayValue
-        
-        print("FETCHED FROM API: \(allocations)")
         let previous = self.store.get(uid: self.participant.getUserId())
-        print("CACHED JSON: \(String(describing: previous))")
+        
         if let prevAlloc = previous {
           if Allocator.allocationsNotEmpty(allocations: previous) {
             allocations = Allocations.reconcileAllocations(previousAllocations: prevAlloc, currentAllocations: allocations)
@@ -81,8 +79,6 @@ public class Allocator {
         }
         
         self.store.set(uid: self.participant.getUserId(), allocations: allocations)
-        let cachedAgain = self.store.get(uid: self.participant.getUserId())
-        print("FETCHED JSON CACHED NOW: \(String(describing: cachedAgain))")
         self.allocationStatus = AllocationStatus.RETRIEVED
         
         if (self.confirmationSandbagged) {
@@ -94,7 +90,7 @@ public class Allocator {
         }
         resolve.fulfill(allocations)
         do {
-          try? self.executionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
+          try self.executionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
         } catch let err {
           let message = "There was an error executing with allocations. \(err.localizedDescription)"
           self.LOGGER.log(.error, message: message)

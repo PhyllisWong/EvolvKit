@@ -37,7 +37,7 @@ class Tests: XCTestCase {
     let defaultValue = "FooBar"
     let applyFunction: (String) -> Void = { value in
       
-      XCTAssertEqual(<#T##expression1: Equatable##Equatable#>, <#T##expression2: Equatable##Equatable#>)
+      // XCTAssertEqual(<#T##expression1: Equatable##Equatable#>, <#T##expression2: Equatable##Equatable#>)
     }
     
     let participantId = "id"
@@ -74,7 +74,7 @@ class Tests: XCTestCase {
     let subscriptionKey = "foo.bar"
     let defaultValue = "FooBar"
     let applyFunction: (String) -> Void = { value in
-      XCTAssertEqual(<#T##expression1: Equatable##Equatable#>, <#T##expression2: Equatable##Equatable#>)
+      // XCTAssertEqual(<#T##expression1: Equatable##Equatable#>, <#T##expression2: Equatable##Equatable#>)
     }
     
     let participantId = "id"

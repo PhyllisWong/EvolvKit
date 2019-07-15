@@ -23,6 +23,7 @@ enum EvolvKeyError: String, Error {
   case elementFails = "Element Fails"
   case genomeEmpty = "Genome Empty"
   case mismatchTypes = "Mismatched Types"
+  case keyError = "Key Error"
 }
 
 extension EvolvKeyError: LocalizedError {
