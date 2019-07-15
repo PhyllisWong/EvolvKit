@@ -92,11 +92,44 @@ public class Allocator {
         do {
           try self.executionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
         } catch let err {
+          self.resolveAllocationsFailure()
           let message = "There was an error executing with allocations. \(err.localizedDescription)"
           self.LOGGER.log(.error, message: message)
         }
       }
     }
+  }
+  
+  public func resolveAllocationsFailure() -> [JSON] {
+    let previous = self.store.get(uid: self.participant.getUserId())
+    
+    guard let prevAllocations = previous else {
+      LOGGER.log(.error, message: "Falling back to the supplied defaults.")
+      allocationStatus = AllocationStatus.FAILED
+      executionQueue.executeAllWithValuesFromDefaults()
+      return [JSON]()
+    }
+    
+    if Allocator.allocationsNotEmpty(allocations: prevAllocations) {
+      LOGGER.log(.debug, message: "Falling back to participant's previous allocation.")
+      
+      if confirmationSandbagged {
+        eventEmitter.confirm(allocations: prevAllocations)
+      }
+      if contaminationSandbagged {
+        eventEmitter.contaminate(allocations: prevAllocations)
+      }
+      
+      allocationStatus = AllocationStatus.RETRIEVED
+      do {
+        try executionQueue.executeAllWithValuesFromAllocations(allocations: prevAllocations)
+      } catch {
+        LOGGER.log(.error, message: "Execution with values from Allocations fails, falling back on defaults.")
+        executionQueue.executeAllWithValuesFromDefaults()
+      }
+      
+    }
+    return prevAllocations
   }
   
   static func allocationsNotEmpty(allocations: [JSON]?) -> Bool {
