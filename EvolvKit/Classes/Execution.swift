@@ -8,9 +8,6 @@
 
 import SwiftyJSON
 
-protocol Default {
-  associatedtype T
-}
 
 class Execution<T> {
   
