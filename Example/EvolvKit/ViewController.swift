@@ -14,15 +14,16 @@ import EvolvKit
 class ViewController: UIViewController {
   
   @IBOutlet weak var textLabel: UILabel!
+  @IBOutlet weak var checkoutButton: UIButton!
   
   let store : AllocationStoreProtocol
   var allocations = [JSON]()
-  var client : EvolvClientProtocol?
+  var client : EvolvClientProtocol
   var httpClient: HttpProtocol
   let LOGGER = Log.logger
   
   @IBAction func didPressCheckOut(_ sender: Any) {
-    client?.emitEvent(key: "conversion")
+    client.emitEvent(key: "conversion")
     self.textLabel.text = "Conversion!"
   }
   
@@ -30,16 +31,18 @@ class ViewController: UIViewController {
     self.textLabel.text = "Some really cool product info!"
   }
   
+  // FIXME: Migrate setup to app delegate
   required init?(coder aDecoder: NSCoder) {
     /*
-     When you get the json from the participants API, it will come as a string of json array.
-     If you use the EvolvHttpClient, the json will be parsed with SwiftyJSON. This example shows
-     how the data is structures, but will be obfuscated in your implementation.
+     When you receive the fetched json from the participants API, it will be as type String.
+     If you use the EvolvHttpClient, the json will be parsed with SwiftyJSON (required data type for our implementation of the cache.
+     This example shows how the data can be structured, your implementation can work directly with the raw String and serialize into Swift if you choose.
      Uncomment each storedAllocation one at a time to see the UI change based on the allocation.
      */
-    // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"Begin Secure Checkout\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
-    let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_2\",\"buttons\":{\"checkout\":{\"text\":\"Begin Secure Checkout\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
-    // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_3\",\"buttons\":{\"checkout\":{\"text\":\"Begin Secure Checkout\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
+    
+    let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"option_1\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
+    // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_3\",\"buttons\":{\"checkout\":{\"text\":\"option_3\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
+    // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_7\",\"buttons\":{\"checkout\":{\"text\":\"option_7\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
     store = CustomAllocationStore()
     
     if let dataFromString = myStoredAllocation.data(using: String.Encoding.utf8, allowLossyConversion: false) {
@@ -47,39 +50,62 @@ class ViewController: UIViewController {
         self.allocations = try JSON(data: dataFromString).arrayValue
         store.set(uid: "sandbox_user", allocations: self.allocations)
       } catch {
-        LOGGER.log(.error, message: "Error converting string json to SwiftyJSON")
+        let message = "Error converting string json to SwiftyJSON"
+        LOGGER.log(.error, message: message)
       }
     }
     
     httpClient = EvolvHttpClient()
     
-    // build config with custom timeout and custom allocation store
+    /// - Build config with custom timeout and custom allocation store
     // set client to use sandbox environment
     let config = EvolvConfig.builder(environmentId: "sandbox", httpClient: httpClient)
       .setEvolvAllocationStore(allocationStore: store)
       .build()
     
-    // initialize the client with a stored user
+    /// - Initialize the client with a stored user
+    /// fetches allocations from Evolv, and stores them in a custom store
     client = EvolvClientFactory(config: config, participant: EvolvParticipant.builder()
       .setUserId(userId: "sandbox_user").build()).client as! EvolvClientImpl
     
-//    // initialize the client with a new user
-//        client = AscendClientFactory.init(config)
-   
+    /// - Initialize the client with a new user
+    /// - Uncomment this line if you prefer this initialization.
+    // client = EvolvClientFactory(config: config) as! EvolvClientProtocol
+    
     super.init(coder: aDecoder)
   }
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    // Retrieve allocations in the background as the first thing.
-
+    
     guard let statusBarView = UIApplication.shared.value(forKeyPath: "statusBarWindow.statusBar") as? UIView else { return }
     statusBarView.backgroundColor = UIColor(red: 0.0, green: 0.3, blue: 0.3, alpha: 1.0)
-    _ = getJsonData()
     
-    client?.subscribe(key: "ui.layout", defaultValue: "#ffffff", function: setContentViewWith)
-    client?.confirm()
-
+    
+    client.subscribe(key: "ui.layout", defaultValue: "#000000", function: setContentViewWith)
+    
+    client.subscribe(key: "ui.buttons.checkout.text", defaultValue: "Checkout", function: changeButtonText)
+    client.confirm()
+    
+  }
+  
+  
+  /// Example of a closure that will affect the UI
+  lazy var changeButtonText : (String) -> () = { buttonTextOption in
+    // TODO: Make this change the text of the button
+    DispatchQueue.main.async {
+      switch buttonTextOption {
+      case "option_1":
+        self.checkoutButton.setTitle("Begin Secure Checkout", for: .normal)
+      case "option_2":
+        self.checkoutButton.setTitle("Begin Checkout", for: .normal)
+      case "option_3":
+        self.checkoutButton.setTitle("Start Checkout Process", for: .normal)
+      default:
+        self.checkoutButton.setTitle("Checkout", for: .normal)
+      }
+    }
+    print("FOO")
   }
   
   override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -89,41 +115,29 @@ class ViewController: UIViewController {
 
 private extension ViewController {
   
-  func setContentViewWith(_ layoutOption: Any) -> () {
-    let json = layoutOption as! JSON
-    if let stringOption = json.rawString() {
-      
-      // this operation needs to run on the UI thread
-      DispatchQueue.main.async {
-        switch stringOption {
-        case "option_1":
-          self.view.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 0.5, alpha: 1.0)
-          
-        case "option_2":
-          self.view.backgroundColor = UIColor(red: 0.6, green: 0.9, blue: 0.5, alpha: 1.0)
-          
-        case "option_3":
-          self.view.backgroundColor = UIColor(red: 32/255, green: 79/255, blue: 79/255, alpha: 1)
-          
-        case "option_4":
-          self.view.backgroundColor = UIColor(red: 59/255, green: 144/255, blue: 147/255, alpha: 1)
-        default:
-          self.view.backgroundColor = UIColor(red: 219/255, green: 254/255, blue: 248/255, alpha: 1)
-        }
+  /// This function can be a simple function, a closure, or any execution that will apply the treatments from the allocation.
+  ///
+  /// - Parameter layoutOption: Implementer decides what the data type will be.
+  ///   Needs to match subscribe method's default value data type.
+  func setContentViewWith(_ layoutOption: String) -> () {
+    // this operation needs to run on the UI thread
+    DispatchQueue.main.async {
+      switch layoutOption {
+      case "option_1":
+        self.view.backgroundColor = UIColor(red: 1.0, green: 1.0, blue: 0.5, alpha: 1.0)
+        
+      case "option_2":
+        self.view.backgroundColor = UIColor(red: 0.6, green: 0.9, blue: 0.5, alpha: 1.0)
+        
+      case "option_3":
+        self.view.backgroundColor = UIColor(red: 32/255, green: 79/255, blue: 79/255, alpha: 1)
+        
+      case "option_4":
+        self.view.backgroundColor = UIColor(red: 59/255, green: 144/255, blue: 147/255, alpha: 1)
+      default:
+        self.view.backgroundColor = UIColor(hexString: layoutOption)
       }
     }
   }
   
-  private func getJsonData() -> String {
-    guard let client = self.client else { return "" }
-    let key = "someKey"
-    // get this to execute on the main thread and change the UI
-    
-    // Client makes the call to get the allocations
-   
-    client.emitEvent(key: key, score: 1.0)
-    // client.contaminate()
-    return key
-  }
 }
-

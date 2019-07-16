@@ -70,19 +70,16 @@ public class Allocator {
       
       let _ = self.httpClient.get(url: url).done { (stringJSON) in
         var allocations = JSON.init(parseJSON: stringJSON).arrayValue
-        
-        print("FETCHED FROM API: \(allocations)")
         let previous = self.store.get(uid: self.participant.getUserId())
-        print("CACHED JSON: \(String(describing: previous))")
+        
         if let prevAlloc = previous {
           if Allocator.allocationsNotEmpty(allocations: previous) {
-            allocations = Allocations.reconcileAllocations(previousAllocations: prevAlloc, currentAllocations: allocations)
+            allocations = Allocations.reconcileAllocations(previousAllocations: prevAlloc,
+                                                           currentAllocations: allocations)
           }
         }
         
         self.store.set(uid: self.participant.getUserId(), allocations: allocations)
-        let cachedAgain = self.store.get(uid: self.participant.getUserId())
-        print("FETCHED JSON CACHED NOW: \(String(describing: cachedAgain))")
         self.allocationStatus = AllocationStatus.RETRIEVED
         
         if (self.confirmationSandbagged) {
@@ -94,13 +91,46 @@ public class Allocator {
         }
         resolve.fulfill(allocations)
         do {
-          try? self.executionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
+          try self.executionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
         } catch let err {
+          _ = self.resolveAllocationsFailure()
           let message = "There was an error executing with allocations. \(err.localizedDescription)"
           self.LOGGER.log(.error, message: message)
         }
       }
     }
+  }
+  
+  public func resolveAllocationsFailure() -> [JSON] {
+    let previous = self.store.get(uid: self.participant.getUserId())
+    
+    guard let prevAllocations = previous else {
+      LOGGER.log(.error, message: "Falling back to the supplied defaults.")
+      allocationStatus = AllocationStatus.FAILED
+      executionQueue.executeAllWithValuesFromDefaults()
+      return [JSON]()
+    }
+    
+    if Allocator.allocationsNotEmpty(allocations: prevAllocations) {
+      LOGGER.log(.debug, message: "Falling back to participant's previous allocation.")
+      
+      if confirmationSandbagged {
+        eventEmitter.confirm(allocations: prevAllocations)
+      }
+      if contaminationSandbagged {
+        eventEmitter.contaminate(allocations: prevAllocations)
+      }
+      
+      allocationStatus = AllocationStatus.RETRIEVED
+      do {
+        try executionQueue.executeAllWithValuesFromAllocations(allocations: prevAllocations)
+      } catch {
+        LOGGER.log(.error, message: "Execution with values from Allocations fails, falling back on defaults.")
+        executionQueue.executeAllWithValuesFromDefaults()
+      }
+      
+    }
+    return prevAllocations
   }
   
   static func allocationsNotEmpty(allocations: [JSON]?) -> Bool {

@@ -20,8 +20,7 @@ public class Allocations {
   func getMyType<T>(_ element: T) -> Any? {
     return type(of: element)
   }
-  
-  // FIXME: clean this up!
+
   func getValueFromAllocations<T>(_ key: String, _ type: T, _ participant: EvolvParticipant) throws -> JSON? {
     let keyParts = key.components(separatedBy: ".")
     
@@ -44,20 +43,19 @@ public class Allocations {
   
   private func getElementFromGenome(genome: JSON, keyParts: [String]) throws -> JSON {
     var element: JSON = genome
-    if element.count <= 0 {
-      throw EvolvKeyError(rawValue: "Allocation genome was empty")!
+    if element.isEmpty {
+      throw EvolvKeyError.genomeEmpty
     }
     
     for part in keyParts {
       let object = element[part]
       element = object
     
-      if (element.error == nil) {
-        // throw EvolvKeyError(rawValue: "element fails")!
+      if (element.error != nil) {
+        throw EvolvKeyError.elementFails
         LOGGER.log(.error, message: "Element fails")
       }
     }
-    print("element: \(element)")
     return element
   }
   

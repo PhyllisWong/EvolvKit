@@ -12,6 +12,9 @@ public protocol AllocationStoreProtocol {
   
   /**
    Retrieves a JsonArray.
+   - SwiftyJSON is a required package for
+   implementing the store. You can install SwiftyJSON here: https://cocoapods.org/pods/SwiftyJSON.
+   
    - Retrieves a JsonArray converted to json using SwiftyJSON. JsonArray represents the participant's allocations.
    If there are no stored allocations, should return an empty SwiftyJSON array.
    - Parameters:

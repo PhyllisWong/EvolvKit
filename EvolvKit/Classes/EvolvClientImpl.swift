@@ -78,17 +78,15 @@ public class EvolvClientImpl : EvolvClientProtocol {
     return value
   }
   
-  public func subscribe(key: String, defaultValue: Any, function: @escaping (Any) -> ()) {
-    // let execution = Execution(key, defaultValue, function, participant)
+  public func subscribe<T>(key: String, defaultValue: T, function: @escaping (T) -> ()) {
     let execution = Execution(key, defaultValue, participant, function)
     let previousAlloc = self.store.get(uid: self.participant.getUserId())
-    print("previousAlloc: \(String(describing: previousAlloc))")
+    
     if let prevAlloc = previousAlloc {
-      let prevJSON = prevAlloc
       do {
-        try execution.executeWithAllocation(rawAllocations: prevJSON)
+        try execution.executeWithAllocation(rawAllocations: prevAlloc)
       } catch {
-        let message = "Unable to retrieve the value of \(key) from the allocation."
+        let message = "Error from \(key). Error message: \(error.localizedDescription)."
         LOGGER.log(.error, message: message)
         execution.executeWithDefault()
       }
@@ -96,7 +94,8 @@ public class EvolvClientImpl : EvolvClientProtocol {
     
     let allocationStatus = allocator.getAllocationStatus()
     if allocationStatus == Allocator.AllocationStatus.FETCHING {
-      // 1. enqueue the execution
+      // Perhaps user DispatchQueue here
+      executionQueue.enqueue(execution: execution)
       return
     } else if allocationStatus == Allocator.AllocationStatus.RETRIEVED {
       let alloc = store.get(uid: self.participant.getUserId())
