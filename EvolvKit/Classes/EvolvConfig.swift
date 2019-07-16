@@ -8,6 +8,10 @@
 
 public class EvolvConfig {
   
+  static public let DEFAULT_HTTP_SCHEME = "https"
+  static public let DEFAULT_DOMAIN = "participants.evolv.ai"
+  static public let DEFAULT_API_VERSION = "v1"
+  
   private let httpScheme: String
   private let domain: String
   private let version: String
@@ -15,6 +19,8 @@ public class EvolvConfig {
   private let evolvAllocationStore: AllocationStoreProtocol
   private let httpClient: HttpProtocol
   private let executionQueue = ExecutionQueue.shared
+  
+  fileprivate static var DEFAULT_ALLOCATION_STORE_SIZE = 1000
   
   init(_ httpScheme: String, _ domain: String, _ version: String,
        _ environmentId: String, _ evolvAllocationStore: AllocationStoreProtocol,
@@ -55,17 +61,11 @@ public class EvolvConfig {
 /// Note: Swift builder pattern is implemented with adjacent classes.
 
 public class ConfigBuilder {
-  
-  static let DEFAULT_HTTP_SCHEME = "https"
-  static let DEFAULT_DOMAIN = "participants.evolv.ai"
-  static let DEFAULT_API_VERSION = "v1"
-  
-  private static let DEFAULT_ALLOCATION_STORE_SIZE = 1000
-  
-  private var allocationStoreSize: Int = DEFAULT_ALLOCATION_STORE_SIZE
-  private var httpScheme: String = DEFAULT_HTTP_SCHEME
-  private var domain: String = DEFAULT_DOMAIN
-  private var version: String = DEFAULT_API_VERSION
+
+  private var allocationStoreSize = EvolvConfig.DEFAULT_ALLOCATION_STORE_SIZE
+  private var httpScheme: String = EvolvConfig.DEFAULT_HTTP_SCHEME
+  private var domain: String = EvolvConfig.DEFAULT_DOMAIN
+  private var version: String = EvolvConfig.DEFAULT_API_VERSION
   private var allocationStore: AllocationStoreProtocol?
   
   private var environmentId: String

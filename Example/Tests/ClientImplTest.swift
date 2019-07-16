@@ -6,12 +6,12 @@ import PromiseKit
 class ClientImplTests: XCTestCase {
   
   var allocationStoreMock: AllocationStoreMock!
-  var httpClientMock : HttpClientMock!
+  var httpClientMock : ClientHttpClientMock!
   
   override func setUp() {
     // Put setup code here. This method is called before the invocation of each test method in the class.
     self.allocationStoreMock = AllocationStoreMock(testCase: self)
-    self.httpClientMock = HttpClientMock()
+    self.httpClientMock = ClientHttpClientMock()
   }
   
   override func tearDown() {
@@ -125,7 +125,7 @@ class ExecutionMock<T>: Execution<T> {
 
 // TODO: finish creating mocks
 
-class HttpClientMock: HttpProtocol {
+class ClientHttpClientMock: HttpProtocol {
   func get(url: URL) -> Promise<String> {
     fatalError()
   }
@@ -134,7 +134,6 @@ class HttpClientMock: HttpProtocol {
     fatalError()
   }
 }
-
 
 class AllocationStoreMock: AllocationStoreProtocol {
   

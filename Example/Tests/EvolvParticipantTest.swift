@@ -3,7 +3,7 @@ import SwiftyJSON
 import PromiseKit
 @testable import EvolvKit
 
-class EvolvParticipantTests: XCTestCase {
+class EvolvParticipantTest: XCTestCase {
   
   override func setUp() {
     super.setUp()
