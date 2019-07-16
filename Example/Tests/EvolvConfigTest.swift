@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import SwiftyJSON
 import PromiseKit
 @testable import EvolvKit
 
@@ -17,7 +16,7 @@ class EvolvConfigTest: XCTestCase {
   private var mockHttpClient: HttpProtocol!
 
     override func setUp() {
-        self.mockHttpClient = ConfigHttpClientMock()
+        self.mockHttpClient = HttpClientMock()
     }
 
     override func tearDown() {
@@ -57,16 +56,4 @@ class EvolvConfigTest: XCTestCase {
       XCTAssertNotNil(config.getEvolvAllocationStore())
       XCTAssertEqual(httpScheme, config.getHttpScheme())
     }
-
 }
-
-class ConfigHttpClientMock: HttpProtocol {
-  func get(url: URL) -> Promise<String> {
-    fatalError()
-  }
-  
-  func sendEvents(url: URL) {
-    fatalError()
-  }
-}
-

@@ -3,15 +3,15 @@ import SwiftyJSON
 import PromiseKit
 @testable import EvolvKit
 
-class ClientImplTests: XCTestCase {
+class ClientImplTest: XCTestCase {
   
   var allocationStoreMock: AllocationStoreMock!
-  var httpClientMock : ClientHttpClientMock!
+  var httpClientMock : HttpClientMock!
   
   override func setUp() {
     // Put setup code here. This method is called before the invocation of each test method in the class.
     self.allocationStoreMock = AllocationStoreMock(testCase: self)
-    self.httpClientMock = ClientHttpClientMock()
+    self.httpClientMock = HttpClientMock()
   }
   
   override func tearDown() {
@@ -49,12 +49,6 @@ class ClientImplTests: XCTestCase {
       
       return nil
     }
-    
-    /*
-     mock the allocationStatus
-     mock executeWithAllocation eith from store or API
-     mock executeWithDefault
-     */
     
     let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.allocationStoreMock, self.httpClientMock)
     let emitter = EventEmitter(config: config, participant: participant)
@@ -107,64 +101,6 @@ class ClientImplTests: XCTestCase {
     let p = EvolvParticipant.builder().build()
     p.setUserId(userId: "test_user")
     XCTAssertEqual(p.getUserId(), "test_user")
-  }
-  
-}
-
-class ExecutionMock<T>: Execution<T> {
-  
-  override func executeWithDefault() {
-    
-  }
-  
-  override func executeWithAllocation(rawAllocations: [JSON]) throws {
-    
-  }
-}
-
-
-// TODO: finish creating mocks
-
-class ClientHttpClientMock: HttpProtocol {
-  func get(url: URL) -> Promise<String> {
-    fatalError()
-  }
-  
-  func sendEvents(url: URL) {
-    fatalError()
-  }
-}
-
-class AllocationStoreMock: AllocationStoreProtocol {
-  
-  let testCase: XCTestCase
-  
-  init (testCase: XCTestCase) {
-    self.testCase = testCase
-  }
-  
-  var expectGetExpectation: XCTestExpectation?
-  private var mockedGet: (String) -> [JSON]? = { _ in
-    XCTFail("unexpected call to get")
-    return []
-  }
-  
-  @discardableResult
-  func expectGet(_ mocked: @escaping (_ uid: String) -> [JSON]?) -> XCTestExpectation {
-    self.expectGetExpectation = self.testCase.expectation(description: "expect get")
-    self.mockedGet = mocked
-    return expectGetExpectation!
-  }
-  
-  // conform to protocol
-  
-  func get(uid: String) -> [JSON]? {
-    self.expectGetExpectation?.fulfill()
-    return mockedGet(uid)
-  }
-  
-  func set(uid: String, allocations: [JSON]) {
-    fatalError()
   }
   
 }

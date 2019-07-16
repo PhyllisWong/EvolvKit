@@ -57,8 +57,8 @@ public class Allocator {
       URLQueryItem(name: "uid", value: "\(participant.getUserId())")
     ]
     
-    if let url = components.url { return url }
-    return URL(string: "")!
+    guard let url = components.url else { return URL(string: "")! }
+    return url
   }
   
   public typealias JsonArray = [JSON]
