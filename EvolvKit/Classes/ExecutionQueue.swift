@@ -8,38 +8,77 @@
 
 import SwiftyJSON
 
-public class ExecutionQueue<T> {
+public class ExecutionQueue {
   private let LOGGER = Log.logger
-  private var queue : LinkedQueue<Execution<T>>
+  private var queue = [Any]()
   
-  init () {
-    self.queue = LinkedQueue<Execution<T>>()
-  }
+  init () {}
+  
+  static let shared = ExecutionQueue()
   
   func enqueue<T>(execution: Execution<T>) {
-    self.queue.add(execution)
+    self.queue.insert(execution, at: 0)
+    print(self.queue)
   }
   
   func executeAllWithValuesFromAllocations(allocations: [JSON]) throws {
     while !queue.isEmpty {
-      let execution: Execution = queue.remove()!
-      
+      var execution = queue.popLast() as Any
       do {
-        try execution.executeWithAllocation(rawAllocations: allocations)
-      } catch let err {
-        let message = "There was an error retrieving the value of " +
-          "\(execution.getKey()) from the allocation. \(err.localizedDescription)"
+        if let executionString = execution as? Execution<String> {
+          try executionString.executeWithAllocation(rawAllocations: allocations)
+          execution = executionString as Execution<String>
+        } else if let executionInt = execution as? Execution<Int> {
+          try executionInt.executeWithAllocation(rawAllocations: allocations)
+          execution = executionInt as Execution<Int>
+        } else if let executionDbl = execution as? Execution<Double> {
+          try executionDbl.executeWithAllocation(rawAllocations: allocations)
+          execution = executionDbl as Execution<Double>
+        } else if let executionBool = execution as? Execution<Bool> {
+          try executionBool.executeWithAllocation(rawAllocations: allocations)
+          execution = executionBool as Execution<Bool>
+        } else if let executionFloat = execution as? Execution<Float> {
+          try executionFloat.executeWithAllocation(rawAllocations: allocations)
+          execution = executionFloat as Execution<Float>
+        } else {
+          continue
+        }
+      } catch {
+        let message = "There was an error retrieving the value of from the allocation."
         LOGGER.log(.debug, message: message)
-        execution.executeWithDefault()
-        throw EvolvKeyError.keyError
+        if let executionString = execution as? Execution<String> {
+          executionString.executeWithDefault()
+        } else if let executionInt = execution as? Execution<Int> {
+          executionInt.executeWithDefault()
+        } else if let executionDbl = execution as? Execution<Double> {
+          executionDbl.executeWithDefault()
+        } else if let executionBool = execution as? Execution<Bool> {
+          executionBool.executeWithDefault()
+        } else {
+          continue
+        }
       }
     }
   }
   
   func executeAllWithValuesFromDefaults() {
     while !queue.isEmpty {
-      let execution: Execution = queue.remove()!
-      execution.executeWithDefault()
+      let execution = queue.removeLast() as Any
+      do {
+        if let executionString = execution as? Execution<String> {
+          executionString.executeWithDefault()
+        } else if let executionInt = execution as? Execution<Int> {
+          executionInt.executeWithDefault()
+        } else if let executionDbl = execution as? Execution<Double> {
+          executionDbl.executeWithDefault()
+        } else if let executionBool = execution as? Execution<Bool> {
+          executionBool.executeWithDefault()
+        } else {
+          continue
+        }
+        let message = "There was an error retrieving the value of from the allocation."
+        LOGGER.log(.debug, message: message)
+      }
     }
   }
 }

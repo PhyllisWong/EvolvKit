@@ -83,9 +83,8 @@ public class EvolvClientImpl : EvolvClientProtocol {
     let previousAlloc = self.store.get(uid: self.participant.getUserId())
     
     if let prevAlloc = previousAlloc {
-      let prevJSON = prevAlloc
       do {
-        try execution.executeWithAllocation(rawAllocations: prevJSON)
+        try execution.executeWithAllocation(rawAllocations: prevAlloc)
       } catch {
         let message = "Error from \(key). Error message: \(error.localizedDescription)."
         LOGGER.log(.error, message: message)
@@ -95,6 +94,7 @@ public class EvolvClientImpl : EvolvClientProtocol {
     
     let allocationStatus = allocator.getAllocationStatus()
     if allocationStatus == Allocator.AllocationStatus.FETCHING {
+      // Perhaps user DispatchQueue here
       executionQueue.enqueue(execution: execution)
       return
     } else if allocationStatus == Allocator.AllocationStatus.RETRIEVED {

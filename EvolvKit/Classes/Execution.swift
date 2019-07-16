@@ -42,14 +42,12 @@ class Execution<T> {
       throw EvolvKeyError.errorMessage
     }
     
-    
     guard let genericValue = value.rawValue as? T else {
       throw EvolvKeyError.mismatchTypes
     }
     
     let activeExperiements = allocations.getActiveExperiments()
     if alreadyExecuted.isEmpty || alreadyExecuted == activeExperiements {
-      
       // there was a change to the allocations after reconciliation, apply changes
       closure(genericValue)
     }

@@ -14,7 +14,7 @@ public class EvolvConfig {
   private let environmentId: String
   private let evolvAllocationStore: AllocationStoreProtocol
   private let httpClient: HttpProtocol
-  private let executionQueue: ExecutionQueue
+  private let executionQueue = ExecutionQueue.shared
   
   init(_ httpScheme: String, _ domain: String, _ version: String,
        _ environmentId: String, _ evolvAllocationStore: AllocationStoreProtocol,
@@ -26,7 +26,6 @@ public class EvolvConfig {
     self.environmentId = environmentId
     self.evolvAllocationStore = evolvAllocationStore
     self.httpClient = httpClient
-    self.executionQueue = ExecutionQueue()
   }
   
   static public func builder(environmentId: String, httpClient: HttpProtocol) -> ConfigBuilder {
