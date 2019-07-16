@@ -18,12 +18,12 @@ class ViewController: UIViewController {
   
   let store : AllocationStoreProtocol
   var allocations = [JSON]()
-  var client : EvolvClientProtocol
+  //var client : EvolvClientProtocol
   var httpClient: HttpProtocol
   let LOGGER = Log.logger
   
   @IBAction func didPressCheckOut(_ sender: Any) {
-    client.emitEvent(key: "conversion")
+    //client.emitEvent(key: "conversion")
     self.textLabel.text = "Conversion!"
   }
   
@@ -65,8 +65,8 @@ class ViewController: UIViewController {
     
     /// - Initialize the client with a stored user
     /// fetches allocations from Evolv, and stores them in a custom store
-    client = EvolvClientFactory(config: config, participant: EvolvParticipant.builder()
-      .setUserId(userId: "sandbox_user").build()).client as! EvolvClientImpl
+    //client = EvolvClientFactory(config: config, participant: EvolvParticipant.builder()
+      //.setUserId(userId: "sandbox_user").build()).client as! EvolvClientImpl
     
     /// - Initialize the client with a new user
     /// - Uncomment this line if you prefer this initialization.
@@ -82,10 +82,10 @@ class ViewController: UIViewController {
     statusBarView.backgroundColor = UIColor(red: 0.0, green: 0.3, blue: 0.3, alpha: 1.0)
     
     
-    client.subscribe(key: "ui.layout", defaultValue: "#000000", function: setContentViewWith)
+    //client.subscribe(key: "ui.layout", defaultValue: "#000000", function: setContentViewWith)
     
-    client.subscribe(key: "ui.buttons.checkout.text", defaultValue: "Checkout", function: changeButtonText)
-    client.confirm()
+    //client.subscribe(key: "ui.buttons.checkout.text", defaultValue: "Checkout", function: changeButtonText)
+    //client.confirm()
     
   }
   

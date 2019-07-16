@@ -3,13 +3,12 @@ import SwiftyJSON
 import PromiseKit
 @testable import EvolvKit
 
-class Tests: XCTestCase {
+class ClientImplTests: XCTestCase {
   
   var allocationStoreMock: AllocationStoreMock!
   var httpClientMock : HttpClientMock!
   
   override func setUp() {
-    super.setUp()
     // Put setup code here. This method is called before the invocation of each test method in the class.
     self.allocationStoreMock = AllocationStoreMock(testCase: self)
     self.httpClientMock = HttpClientMock()
@@ -17,21 +16,19 @@ class Tests: XCTestCase {
   
   override func tearDown() {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
-    super.tearDown()
   }
   
   func testExample() {
     // This is an example of a functional test case.
-    XCTAssert(true, "Pass")
+    // Use XCTAssert and related functions to verify your tests produce the correct results.
   }
   
   func testPerformanceExample() {
     // This is an example of a performance test case.
-    self.measure() {
+    self.measure {
       // Put the code you want to measure the time of here.
     }
   }
-  
   func testSubscribe_AllocationStoreIsEmpty_SubscriptionKeyIsValid_() {
     let subscriptionKey = "foo.bar"
     let defaultValue = "FooBar"
@@ -45,7 +42,7 @@ class Tests: XCTestCase {
     let participant = EvolvParticipant(userId: participantId, sessionId: "sid", userAttributes: [
       "userId": "id",
       "sessionId": "sid"
-    ])
+      ])
     
     self.allocationStoreMock.expectGet { uid -> [JSON]? in
       XCTAssertEqual(uid, participantId)
@@ -125,6 +122,7 @@ class ExecutionMock<T>: Execution<T> {
   }
 }
 
+
 // TODO: finish creating mocks
 
 class HttpClientMock: HttpProtocol {
@@ -170,5 +168,5 @@ class AllocationStoreMock: AllocationStoreProtocol {
     fatalError()
   }
   
-  
 }
+
