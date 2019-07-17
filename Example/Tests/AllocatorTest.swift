@@ -52,12 +52,12 @@ class AllocatorTest: XCTestCase {
   }
   
   func setUpMockedEvolvConfigWithMockedClient(_ mockedConfig: EvolvConfig, _ actualConfig: EvolvConfig,
-                                               _ mockExecutionQueue: ExecutionQueue, _ mockHttpClient: HttpProtocol,
-                                               _ mockAllocationStore: AllocationStoreProtocol) -> EvolvConfig {
+                                              _ mockExecutionQueue: ExecutionQueue, _ mockHttpClient: HttpProtocol,
+                                              _ mockAllocationStore: AllocationStoreProtocol) -> EvolvConfig {
     
     return EvolvConfig(actualConfig.getHttpScheme(), actualConfig.getDomain(),
-                                             actualConfig.getVersion(), actualConfig.getEnvironmentId(),
-                                             mockAllocationStore, mockHttpClient)
+                       actualConfig.getVersion(), actualConfig.getEnvironmentId(),
+                       mockAllocationStore, mockHttpClient)
   }
   
   func createAllocationsUrl(config: EvolvConfig, participant: EvolvParticipant) -> URL {
@@ -73,7 +73,7 @@ class AllocatorTest: XCTestCase {
     return url
   }
   
-  func createConfirmationUrl(config: EvolvConfig, allocation: [JSON], participant: EvolvParticipant) -> URL {
+  func createConfirmationUrl(_ config: EvolvConfig, _ allocation: JSON, _ participant: EvolvParticipant) -> URL {
     var components = URLComponents()
     components.scheme = config.getHttpScheme()
     components.host = config.getDomain()
@@ -137,23 +137,131 @@ class AllocatorTest: XCTestCase {
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
     let allocations = parseRawAllocations(raw: rawAllocation)
     mockAllocationStore.set(uid: participant.getUserId(), allocations: allocations)
+    
     let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
+    
     let allocator = Allocator(config: mockConfig, participant: participant)
     let actualAllocations = allocator.resolveAllocationsFailure()
     
+    let exp = expectation(description: "Execute All With Values From Allocations")
     try! mockExecutionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
+    exp.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    XCTAssertEqual(exp.expectedFulfillmentCount, 1)
     XCTAssertEqual(Allocator.AllocationStatus.RETRIEVED, allocator.getAllocationStatus())
-    // FIXME: why is this not behaving as expected? Do I understand the test?
     XCTAssertEqual(allocations, actualAllocations)
   }
   
-  func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedConfirmation() -> Void {}
+  func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedConfirmation() -> Void {
+    let participant = EvolvParticipant.builder().build()
+    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let allocations = parseRawAllocations(raw: rawAllocation)
+    mockAllocationStore.set(uid: participant.getUserId(), allocations: allocations)
+    
+    let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
+    
+    let allocator = Allocator(config: mockConfig, participant: participant)
+    
+    allocator.sandbagConfirmation()
+    let actualAllocations = allocator.resolveAllocationsFailure()
+    
+    let exp = expectation(description: "Create Confirmation Url, Get Allocations From Store")
+    mockHttpClient.get(url: createConfirmationUrl(actualConfig, allocations[0], participant))
+    exp.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    let exp2 = expectation(description: "Execute All With Values From Allocations")
+    try! mockExecutionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
+    exp2.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    XCTAssertEqual(exp.expectedFulfillmentCount, 1)
+    XCTAssertEqual(exp2.expectedFulfillmentCount, 1)
+    XCTAssertEqual(Allocator.AllocationStatus.RETRIEVED, allocator.getAllocationStatus())
+    XCTAssertEqual(allocations, actualAllocations)
+  }
   
-  func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedContamination() -> Void {}
+  func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedContamination() -> Void {
+    let participant = EvolvParticipant.builder().build()
+    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let allocations = parseRawAllocations(raw: rawAllocation)
+    mockAllocationStore.set(uid: participant.getUserId(), allocations: allocations)
+    
+    let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
+    
+    let allocator = Allocator(config: mockConfig, participant: participant)
+    allocator.sandbagContamination()
+    let actualAllocations = allocator.resolveAllocationsFailure()
+    
+    let exp = expectation(description: "Create Contaminatin Url, Get Allocations From Store")
+    mockHttpClient.get(url: createConfirmationUrl(actualConfig, allocations[0], participant))
+    exp.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    let exp2 = expectation(description: "Execute All With Values From Allocations")
+    try! mockExecutionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
+    exp2.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    XCTAssertEqual(exp.expectedFulfillmentCount, 1)
+    XCTAssertEqual(exp2.expectedFulfillmentCount, 1)
+    XCTAssertEqual(Allocator.AllocationStatus.RETRIEVED, allocator.getAllocationStatus())
+    XCTAssertEqual(allocations, actualAllocations)
+  }
   
-  func testResolveAllocationFailureWithNoAllocationsInStore() -> Void {}
+  func testResolveAllocationFailureWithNoAllocationsInStore() -> Void {
+    let participant = EvolvParticipant.builder().build()
+    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let allocations = mockAllocationStore.get(uid: participant.getUserId())
+    
+    let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
+    let allocator = Allocator(config: mockConfig, participant: participant)
+    allocator.sandbagContamination()
+    
+    let actualAllocations = allocator.resolveAllocationsFailure()
+    
+    let exp = expectation(description: "Execute All With Values From Allocations")
+    try! mockExecutionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
+    exp.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    XCTAssertEqual(exp.expectedFulfillmentCount, 1)
+    XCTAssertEqual(Allocator.AllocationStatus.FAILED, allocator.getAllocationStatus())
+    XCTAssertEqual([JSON](), actualAllocations)
+  }
   
-  func testFetchAllocationsWithNoAllocationsInStore() -> Void {}
+  func testFetchAllocationsWithNoAllocationsInStore() -> Void {
+    var allocationsResponsePromise = String()
+    allocationsResponsePromise = rawAllocation
+    let participant = EvolvParticipant.builder().build()
+    let allocations = parseRawAllocations(raw: rawAllocation)
+    
+    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    
+    let exp = expectation(description: "Client get allocations, none in store")
+    mockHttpClient.get(url: createAllocationsUrl(config: actualConfig, participant: participant))
+    exp.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    let exp2 = expectation(description: "Allocation store get")
+    _ = mockAllocationStore.get(uid: participant.getUserId())
+    exp2.fulfill()
+    waitForExpectations(timeout: 3)
+    
+    let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
+    let allocator = Allocator(config: mockConfig, participant: participant)
+    
+    let allocationsPromise = allocator.fetchAllocations()
+    
+    // TODO: resolve promise and wait for it to complete before moving on in the test
+    try! allocationsPromise.done { (response) in
+      let status = allocator.getAllocationStatus()
+    }.wait()
+    XCTAssertEqual(exp.expectedFulfillmentCount, 1)
+    XCTAssertEqual(exp2.expectedFulfillmentCount, 1)
+    XCTAssertEqual(Allocator.AllocationStatus.RETRIEVED, allocator.getAllocationStatus())
+  }
   
   func testFetchAllocationsWithAReconciliation() -> Void {}
 }

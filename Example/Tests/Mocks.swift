@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Alamofire
 import SwiftyJSON
 import PromiseKit
 @testable import EvolvKit
@@ -48,6 +49,7 @@ class AllocationStoreMock: AllocationStoreProtocol {
   }
   
   // conform to protocol
+   @discardableResult
   func get(uid: String) -> [JSON] {
     self.expectGetExpectation?.fulfill()
     return mockedGet(uid)
@@ -61,12 +63,47 @@ class AllocationStoreMock: AllocationStoreProtocol {
 
 
 class HttpClientMock: HttpProtocol {
+  @discardableResult
   func get(url: URL) -> Promise<String> {
-    fatalError()
+    return Promise<String> { resolver -> Void in
+      
+      Alamofire.request(url)
+        .validate()
+        .responseString { response in
+          switch response.result {
+          case .success( _):
+            
+            if let responseString = response.result.value {
+              
+              resolver.fulfill(responseString)
+            }
+          case .failure(let error):
+            
+            resolver.reject(error)
+          }
+      }
+    }
   }
   
   func sendEvents(url: URL) {
-    fatalError()
+    let headers = [
+      "Content-Type": "application/json",
+      "Host" : "participants.evolv.ai"
+    ]
+    
+    Alamofire.request(url,
+                      method      : .get,
+                      parameters  : nil,
+                      encoding    : JSONEncoding.default ,
+                      headers     : headers).responseData { dataResponse in
+                        
+                        
+                        if dataResponse.response?.statusCode == 202 {
+                          print("All good over here!")
+                        } else {
+                          print("Something really bad happened")
+                        }
+    }
   }
 }
 
