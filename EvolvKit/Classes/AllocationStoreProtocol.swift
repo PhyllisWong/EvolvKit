@@ -22,7 +22,7 @@ public protocol AllocationStoreProtocol {
    - Returns: a SwiftyJSON array of allocation if one exists, else an empty SwiftyJSON array.
    */
   
-  func get(uid: String) -> [JSON]?
+  func get(uid: String) -> [JSON]
   
   /**
    Stores a JsonArray.

@@ -14,8 +14,8 @@ public class DefaultAllocationStore : AllocationStoreProtocol {
   public init(size: Int) {
     self.cache = LRUCache(size)
   }
-  public func get(uid: String) -> [JSON]? {
-    return cache.get(uid)
+  public func get(uid: String) -> [JSON] {
+    return cache.get(uid) ?? [JSON]()
   }
   
   public func set(uid: String, allocations: [JSON]) {

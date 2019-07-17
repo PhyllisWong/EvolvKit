@@ -44,10 +44,10 @@ class ClientImplTest: XCTestCase {
       "sessionId": "sid"
       ])
     
-    self.allocationStoreMock.expectGet { uid -> [JSON]? in
+    self.allocationStoreMock.expectGet { uid -> [JSON] in
       XCTAssertEqual(uid, participantId)
       
-      return nil
+      return [JSON]()
     }
     
     let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.allocationStoreMock, self.httpClientMock)
@@ -75,7 +75,7 @@ class ClientImplTest: XCTestCase {
       "sessionId": "sid"
       ])
     
-    self.allocationStoreMock.expectGet { uid -> [JSON]? in
+    self.allocationStoreMock.expectGet { uid -> [JSON] in
       XCTAssertEqual(uid, participantId)
       
       let myStoredAllocation = "[{\"uid\":\"\(participantId)\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"Begin Secure Checkout\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"

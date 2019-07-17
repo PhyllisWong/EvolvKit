@@ -23,8 +23,8 @@ public class CustomAllocationStore: AllocationStoreProtocol {
     self.allocations = Dictionary()
   }
   
-  public func get(uid: String) -> [JSON]? {
-    return allocations[uid]
+  public func get(uid: String) -> [JSON] {
+    return allocations[uid] ?? [JSON]()
   }
   
   public func set(uid: String, allocations: [JSON]) {
