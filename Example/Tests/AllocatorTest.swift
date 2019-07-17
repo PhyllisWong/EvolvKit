@@ -19,12 +19,12 @@ class AllocatorTest: XCTestCase {
   private var mockConfig: EvolvConfig!
   private var mockExecutionQueue: ExecutionQueue!
   private var mockHttpClient : HttpClientMock!
-  private var mockAllocationStore : AllocationStoreMock!
+  private var mockAllocationStore : AllocationStoreProtocol!
   
   override func setUp() {
     mockExecutionQueue = ExecutionQueueMock()
     mockHttpClient = HttpClientMock()
-    mockAllocationStore = AllocationStoreMock(testCase: self)
+    mockAllocationStore = DefaultAllocationStore(size: 1)
     mockConfig = ConfigMock("https", "test_domain", "test_v", "test_eid", mockAllocationStore, mockHttpClient)
   }
   
@@ -51,9 +51,9 @@ class AllocatorTest: XCTestCase {
     return allocations
   }
   
-  func setUpMockedEvolvConfigWithMockedClient(mockedConfig: EvolvConfig, actualConfig: EvolvConfig,
-                                               mockExecutionQueue: ExecutionQueue, mockHttpClient: HttpProtocol,
-                                               mockAllocationStore: AllocationStoreProtocol) -> EvolvConfig {
+  func setUpMockedEvolvConfigWithMockedClient(_ mockedConfig: EvolvConfig, _ actualConfig: EvolvConfig,
+                                               _ mockExecutionQueue: ExecutionQueue, _ mockHttpClient: HttpProtocol,
+                                               _ mockAllocationStore: AllocationStoreProtocol) -> EvolvConfig {
     
     return EvolvConfig(actualConfig.getHttpScheme(), actualConfig.getDomain(),
                                              actualConfig.getVersion(), actualConfig.getEnvironmentId(),
@@ -111,9 +111,9 @@ class AllocatorTest: XCTestCase {
   
   func testCreateAllocationsUrl() {
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
-    let mockConfig = setUpMockedEvolvConfigWithMockedClient(mockedConfig: self.mockConfig, actualConfig: actualConfig,
-                                               mockExecutionQueue: mockExecutionQueue, mockHttpClient: mockHttpClient,
-                                               mockAllocationStore: mockAllocationStore)
+    let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
+                                                            mockExecutionQueue, mockHttpClient,
+                                                            mockAllocationStore)
     let participant = EvolvParticipant.builder().build()
     let allocator = Allocator(config: mockConfig, participant: participant)
     let actualUrl = allocator.createAllocationsUrl()
@@ -122,4 +122,38 @@ class AllocatorTest: XCTestCase {
     XCTAssertEqual(expectedUrl, actualUrl)
   }
   
+  func testAllocationsNotEmpty() {
+    let nilAllocations: [JSON]? = nil
+    let emptyAllocations = [JSON]()
+    let allocations = parseRawAllocations(raw: rawAllocation)
+    
+    XCTAssertFalse(Allocator.allocationsNotEmpty(allocations: nilAllocations))
+    XCTAssertFalse(Allocator.allocationsNotEmpty(allocations: emptyAllocations))
+    XCTAssertTrue(Allocator.allocationsNotEmpty(allocations: allocations))
+  }
+  
+  func testResolveAllocationFailureWithAllocationsInStore() -> Void {
+    let participant = EvolvParticipant.builder().build()
+    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let allocations = parseRawAllocations(raw: rawAllocation)
+    mockAllocationStore.set(uid: participant.getUserId(), allocations: allocations)
+    let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
+    let allocator = Allocator(config: mockConfig, participant: participant)
+    let actualAllocations = allocator.resolveAllocationsFailure()
+    
+    try! mockExecutionQueue.executeAllWithValuesFromAllocations(allocations: allocations)
+    XCTAssertEqual(Allocator.AllocationStatus.RETRIEVED, allocator.getAllocationStatus())
+    // FIXME: why is this not behaving as expected? Do I understand the test?
+    XCTAssertEqual(allocations, actualAllocations)
+  }
+  
+  func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedConfirmation() -> Void {}
+  
+  func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedContamination() -> Void {}
+  
+  func testResolveAllocationFailureWithNoAllocationsInStore() -> Void {}
+  
+  func testFetchAllocationsWithNoAllocationsInStore() -> Void {}
+  
+  func testFetchAllocationsWithAReconciliation() -> Void {}
 }
