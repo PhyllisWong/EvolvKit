@@ -23,14 +23,14 @@ class AllocationStoreMock: AllocationStoreProtocol {
   }
   
   var expectGetExpectation: XCTestExpectation?
-  var expectSetExpectation : XCTestExpectation?
+  var expectPutExpectation : XCTestExpectation?
   
   private var mockedGet: (String) -> [JSON] = { _ in
     XCTFail("unexpected call to get")
     return []
   }
   
-  private var mockedSet: (String, [JSON]) -> Void = { _,_  in
+  private var mockedPut: (String, [JSON]) -> Void = { _,_  in
     XCTFail("unexpected call to set")
   }
   
@@ -42,10 +42,10 @@ class AllocationStoreMock: AllocationStoreProtocol {
     return expectGetExpectation!
   }
   
-  func expectSet(_ mocked: @escaping (_ uid: String, _ allocations: [JSON]) -> Void) -> XCTestExpectation {
-    self.expectGetExpectation = self.testCase.expectation(description: "expect set")
-    self.mockedSet = mocked
-    return expectGetExpectation!
+  func expectPut(_ mocked: @escaping (_ uid: String, _ allocations: [JSON]) -> Void) -> XCTestExpectation {
+    self.expectPutExpectation = self.testCase.expectation(description: "expect put")
+    self.mockedPut = mocked
+    return expectPutExpectation!
   }
   
   // conform to protocol
@@ -55,9 +55,9 @@ class AllocationStoreMock: AllocationStoreProtocol {
     return mockedGet(uid)
   }
   
-  func set(uid: String, allocations: [JSON]) {
+  func put(uid: String, allocations: [JSON]) {
     self.expectGetExpectation?.fulfill()
-    return mockedSet(uid, allocations)
+    return mockedPut(uid, allocations)
   }
 }
 
