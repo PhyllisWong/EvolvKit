@@ -1,14 +1,14 @@
 //
-//  EvolvClientTest.swift
+//  LruCacheTest.swift
 //  EvolvKit_Tests
 //
-//  Created by phyllis.wong on 7/13/19.
+//  Created by phyllis.wong on 7/18/19.
 //  Copyright © 2019 CocoaPods. All rights reserved.
 //
 
 import XCTest
 
-class EvolvClientTest: XCTestCase {
+class LruCacheTest: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.

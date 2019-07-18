@@ -55,7 +55,7 @@ public class ParticipantBuilder {
    */
   
   public func setUserId(userId: String) -> ParticipantBuilder {
-    self.userId = userId;
+    self.userId = userId
     return self
   }
   
@@ -66,7 +66,7 @@ public class ParticipantBuilder {
    - Returns: this instance of the participant
    */
   public func setSessionId(sessionId: String) -> ParticipantBuilder {
-    self.sessionId = sessionId;
+    self.sessionId = sessionId
     return self
   }
   
@@ -77,7 +77,7 @@ public class ParticipantBuilder {
    - Returns: this instance of the participant
    */
   public func setUserAttributes(userAttributes: [String : String]) -> ParticipantBuilder {
-    self.userAttributes = userAttributes;
+    self.userAttributes = userAttributes
     return self;
   }
   
@@ -86,10 +86,8 @@ public class ParticipantBuilder {
    - Returns: an EvolvParticipant instance.
    */
   public func build() -> EvolvParticipant {
-    let uid = self.userId
-    let sid = self.sessionId
-    let ua = self.userAttributes
-    let participant = EvolvParticipant(userId: uid, sessionId: sid, userAttributes: ua)
-    return participant
+    self.userAttributes.updateValue(self.userId, forKey: "uid")
+    self.userAttributes.updateValue(self.sessionId, forKey: "sid")
+    return EvolvParticipant(userId: self.userId, sessionId: self.sessionId, userAttributes: self.userAttributes)
   }
 }

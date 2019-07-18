@@ -80,33 +80,30 @@ public class EvolvClientImpl : EvolvClientProtocol {
   
   public func subscribe<T>(key: String, defaultValue: T, function: @escaping (T) -> ()) {
     let execution = Execution(key, defaultValue, participant, function)
-    let previousAlloc = self.store.get(uid: self.participant.getUserId())
+    let previous = self.store.get(uid: self.participant.getUserId())
     
-    if let prevAlloc = previousAlloc {
-      do {
-        try execution.executeWithAllocation(rawAllocations: prevAlloc)
-      } catch {
-        let message = "Error from \(key). Error message: \(error.localizedDescription)."
-        LOGGER.log(.error, message: message)
-        execution.executeWithDefault()
-      }
+    do {
+      try execution.executeWithAllocation(rawAllocations: previous)
+    } catch {
+      let message = "Error from \(key). Error message: \(error.localizedDescription)."
+      LOGGER.log(.error, message: message)
+      execution.executeWithDefault()
     }
+
     
     let allocationStatus = allocator.getAllocationStatus()
     if allocationStatus == Allocator.AllocationStatus.FETCHING {
-      // Perhaps user DispatchQueue here
       executionQueue.enqueue(execution: execution)
       return
     } else if allocationStatus == Allocator.AllocationStatus.RETRIEVED {
-      let alloc = store.get(uid: self.participant.getUserId())
-      if let allocations = alloc {
-        do {
-          try execution.executeWithAllocation(rawAllocations: allocations)
-          return
-        } catch let err {
-          let message = "Unable to retieve value from \(key), \(err.localizedDescription)"
-          LOGGER.log(.error, message: message)
-        }
+      let allocations = store.get(uid: self.participant.getUserId())
+
+      do {
+        try execution.executeWithAllocation(rawAllocations: allocations)
+        return
+      } catch let err {
+        let message = "Unable to retieve value from \(key), \(err.localizedDescription)"
+        LOGGER.log(.error, message: message)
       }
     }
     execution.executeWithDefault()
@@ -125,10 +122,8 @@ public class EvolvClientImpl : EvolvClientProtocol {
     if (allocationStatus == Allocator.AllocationStatus.FETCHING) {
       allocator.sandbagConfirmation()
     } else if (allocationStatus == Allocator.AllocationStatus.RETRIEVED) {
-      let alloc = store.get(uid: participant.getUserId())
-      if let allocations = alloc {
-        eventEmitter.confirm(allocations: allocations)
-      }
+      let allocations = store.get(uid: participant.getUserId())
+      eventEmitter.confirm(allocations: allocations)
     }
   }
   
@@ -137,10 +132,8 @@ public class EvolvClientImpl : EvolvClientProtocol {
     if (allocationStatus == Allocator.AllocationStatus.FETCHING) {
       allocator.sandbagContamination()
     } else if (allocationStatus == Allocator.AllocationStatus.RETRIEVED) {
-      let alloc = store.get(uid: participant.getUserId())
-      if let allocations = alloc {
-        eventEmitter.contaminate(allocations: allocations)
-      }
+      let allocations = store.get(uid: participant.getUserId())
+      eventEmitter.contaminate(allocations: allocations)
     }
   }
   

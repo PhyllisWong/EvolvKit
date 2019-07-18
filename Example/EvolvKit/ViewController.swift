@@ -23,7 +23,7 @@ class ViewController: UIViewController {
   let LOGGER = Log.logger
   
   @IBAction func didPressCheckOut(_ sender: Any) {
-    client.emitEvent(key: "conversion")
+    //client.emitEvent(key: "conversion")
     self.textLabel.text = "Conversion!"
   }
   
@@ -40,7 +40,7 @@ class ViewController: UIViewController {
      Uncomment each storedAllocation one at a time to see the UI change based on the allocation.
      */
     
-    let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"option_1\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
+    let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"option_1\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"오늘추천\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
     // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_3\",\"buttons\":{\"checkout\":{\"text\":\"option_3\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
     // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_7\",\"buttons\":{\"checkout\":{\"text\":\"option_7\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
     store = CustomAllocationStore()
@@ -82,21 +82,20 @@ class ViewController: UIViewController {
     statusBarView.backgroundColor = UIColor(red: 0.0, green: 0.3, blue: 0.3, alpha: 1.0)
     
     
-    client.subscribe(key: "ui.layout", defaultValue: "#000000", function: setContentViewWith)
+    //client.subscribe(key: "ui.layout", defaultValue: "#000000", function: setContentViewWith)
     
-    client.subscribe(key: "ui.buttons.checkout.text", defaultValue: "Checkout", function: changeButtonText)
-    client.confirm()
+    client.subscribe(key: "ui.buttons.checkout.text", defaultValue: "오늘의추천", function: changeButtonText)
+    //client.confirm()
     
   }
   
   
   /// Example of a closure that will affect the UI
   lazy var changeButtonText : (String) -> () = { buttonTextOption in
-    // TODO: Make this change the text of the button
     DispatchQueue.main.async {
       switch buttonTextOption {
       case "option_1":
-        self.checkoutButton.setTitle("Begin Secure Checkout", for: .normal)
+        self.checkoutButton.setTitle("당일배송", for: .normal)
       case "option_2":
         self.checkoutButton.setTitle("Begin Checkout", for: .normal)
       case "option_3":

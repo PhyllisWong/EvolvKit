@@ -11,17 +11,20 @@ import SwiftyJSON
 public class ExecutionQueue {
   private let LOGGER = Log.logger
   private var queue = [Any]()
+  public var count : Int!
   
-  init () {}
+  init () {
+    self.count = self.queue.count
+  }
   
   static let shared = ExecutionQueue()
   
   func enqueue<T>(execution: Execution<T>) {
     self.queue.insert(execution, at: 0)
-    print(self.queue)
+    self.count += 1
   }
   
-  func executeAllWithValuesFromAllocations(allocations: [JSON]) throws {
+  public func executeAllWithValuesFromAllocations(allocations: [JSON]) throws {
     while !queue.isEmpty {
       var execution = queue.popLast() as Any
       do {
@@ -63,7 +66,7 @@ public class ExecutionQueue {
   
   func executeAllWithValuesFromDefaults() {
     while !queue.isEmpty {
-      let execution = queue.removeLast() as Any
+      let execution = queue.popLast() as Any
       do {
         if let executionString = execution as? Execution<String> {
           executionString.executeWithDefault()
