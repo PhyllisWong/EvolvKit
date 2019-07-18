@@ -55,7 +55,7 @@ class ViewController: UIViewController {
       }
     }
     
-//    httpClient = EvolvHttpClient()
+    //httpClient = EvolvHttpClient()
     
     /// - Build config with custom timeout and custom allocation store
     // set client to use sandbox environment
