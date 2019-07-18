@@ -78,7 +78,7 @@ public class Allocator {
                                                          currentAllocations: allocations)
         }
         
-        
+
         self.store.put(uid: self.participant.getUserId(), allocations: allocations)
         self.allocationStatus = AllocationStatus.RETRIEVED
         

@@ -136,6 +136,7 @@ class AllocatorTest: XCTestCase {
     let participant = EvolvParticipant.builder().build()
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
     let allocations = parseRawAllocations(raw: rawAllocation)
+
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
     
     let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
@@ -157,6 +158,7 @@ class AllocatorTest: XCTestCase {
     let participant = EvolvParticipant.builder().build()
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
     let allocations = parseRawAllocations(raw: rawAllocation)
+
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
     
     let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
@@ -186,6 +188,7 @@ class AllocatorTest: XCTestCase {
     let participant = EvolvParticipant.builder().build()
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
     let allocations = parseRawAllocations(raw: rawAllocation)
+
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
     
     let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
@@ -249,6 +252,7 @@ class AllocatorTest: XCTestCase {
     let participant = EvolvParticipant.builder().build()
     let allocations = parseRawAllocations(raw: rawAllocation)
     let allocationsJson = parseRawAllocations(raw: rawAllocation)
+
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocationsJson)
     
     let previous = mockAllocationStore.get(uid: participant.getUserId())

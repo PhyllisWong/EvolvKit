@@ -7,60 +7,27 @@
 //
 
 import XCTest
-import SwiftyJSON
-@testable import EvolvKit
 
 class LruCacheTest: XCTestCase {
-  
-  private let rawAllocation: String = "[{\"uid\":\"test_uid\",\"sid\":\"test_sid\",\"eid\":\"test_eid\",\"cid\":\"test_cid\",\"genome\":{\"search\":{\"weighting\":{\"distance\":2.5,\"dealer_score\":2.5}},\"pages\":{\"all_pages\":{\"header_footer\":[\"blue\",\"white\"]},\"testing_page\":{\"megatron\":\"none\",\"header\":\"white\"}},\"algorithms\":{\"feature_importance\":false}},\"excluded\":false}]"
-  
-  func parseRawAllocations(raw: String) -> [JSON] {
-    var allocations = [JSON]()
-    if let dataFromString = raw.data(using: String.Encoding.utf8, allowLossyConversion: false) {
-      allocations = try! JSON(data: dataFromString).arrayValue
+
+    override func setUp() {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    return allocations
-  }
-  
-  func testGertEntryEmptyCache() {
-    let testCacheSize = 10
-    let testKey = "test_key"
-    
-    let cache = LRUCache(testCacheSize)
-    let entry = cache.getEntry(testKey)
-    
-    XCTAssertNotNil(entry)
-    XCTAssertTrue(entry.isEmpty)
-  }
-  
-  func testEvictEntry() {
-    let testCacheSize = 3
-    let keyOne = "key_one"
-    let keyTwo = "key_two"
-    let keyThree = "Key_three"
-    let keyFour = "key_four"
-    
-    let testEntry = parseRawAllocations(raw: rawAllocation)
-    let cache = LRUCache(testCacheSize)
-    
-    cache.putEntry(keyOne, val: testEntry)
-    cache.putEntry(keyTwo, val: testEntry)
-    cache.putEntry(keyThree, val: testEntry)
-    
-    let entryOne = cache.getEntry(keyOne)
-    let entryTwo = cache.getEntry(keyTwo)
-    let entryThree = cache.getEntry(keyThree)
-    
-    cache.putEntry(keyFour, val: testEntry)
-    let entryFour = cache.getEntry(keyFour)
-    
-    let evictedEntry = cache.getEntry(keyOne)
-    
-    XCTAssertEqual(testEntry, entryOne)
-    XCTAssertEqual(testEntry, entryTwo)
-    XCTAssertEqual(testEntry, entryThree)
-    XCTAssertEqual(testEntry, entryFour)
-    XCTAssertTrue(evictedEntry.isEmpty)
-  }
-  
+
+    override func tearDown() {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
+
+    func testExample() {
+        // This is an example of a functional test case.
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    }
+
+    func testPerformanceExample() {
+        // This is an example of a performance test case.
+        self.measure {
+            // Put the code you want to measure the time of here.
+        }
+    }
+
 }

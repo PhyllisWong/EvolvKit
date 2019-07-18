@@ -47,7 +47,7 @@ class ExecutionQueueTest: XCTestCase {
     }
     return allocations
   }
-  
+
   // Mock executions for the execution queue
   func printSomething<T>(value: T) { print("some value: \(value)") }
   func doSomething(key: String) -> () { print("Did something with \(key)!") }
