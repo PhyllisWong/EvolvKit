@@ -14,6 +14,14 @@ class LruCacheTest: XCTestCase {
   
   private let rawAllocation: String = "[{\"uid\":\"test_uid\",\"sid\":\"test_sid\",\"eid\":\"test_eid\",\"cid\":\"test_cid\",\"genome\":{\"search\":{\"weighting\":{\"distance\":2.5,\"dealer_score\":2.5}},\"pages\":{\"all_pages\":{\"header_footer\":[\"blue\",\"white\"]},\"testing_page\":{\"megatron\":\"none\",\"header\":\"white\"}},\"algorithms\":{\"feature_importance\":false}},\"excluded\":false}]"
   
+  func parseRawAllocations(raw: String) -> [JSON] {
+    var allocations = [JSON]()
+    if let dataFromString = raw.data(using: String.Encoding.utf8, allowLossyConversion: false) {
+      allocations = try! JSON(data: dataFromString).arrayValue
+    }
+    return allocations
+  }
+  
   func testGetEntryEmptyCache() {
     let testCacheSize = 10
     let testKey = "test_key"
@@ -26,7 +34,17 @@ class LruCacheTest: XCTestCase {
   }
   
   func testGetEntry() {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+    let testCacheSize = 10
+    let testKey = "test_key"
+    let testEntry = parseRawAllocations(raw: rawAllocation)
+    
+    let cache = LRUCache(testCacheSize)
+    cache.putEntry(testKey, val: testEntry)
+    let entry = cache.getEntry(testKey)
+    
+    XCTAssertNotNil(entry)
+    XCTAssertFalse(entry.isEmpty)
+    XCTAssertEqual(testEntry, entry)
   }
   
   func testExample() {
