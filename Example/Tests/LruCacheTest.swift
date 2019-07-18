@@ -47,16 +47,48 @@ class LruCacheTest: XCTestCase {
     XCTAssertEqual(testEntry, entry)
   }
   
-  func testExample() {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+  func testEvictEntry() {
+    let testCacheSize = 3
+    let keyOne = "key_one"
+    let keyTwo = "key_two"
+    let keyThree = "Key_three"
+    let keyFour = "key_four"
+    
+    let testEntry = parseRawAllocations(raw: rawAllocation)
+    
+    let cache = LRUCache(testCacheSize)
+    
+    cache.putEntry(keyOne, val: testEntry)
+    cache.putEntry(keyTwo, val: testEntry)
+    cache.putEntry(keyThree, val: testEntry)
+    
+    let entryOne = cache.getEntry(keyOne)
+    let entryTwo = cache.getEntry(keyTwo)
+    let entryThree = cache.getEntry(keyThree)
+    
+    cache.putEntry(keyFour, val: testEntry)
+    
+    let evictedEntry = cache.getEntry(keyOne)
+    
+    XCTAssertEqual(testEntry, entryOne)
+    XCTAssertEqual(testEntry, entryTwo)
+    XCTAssertEqual(testEntry, entryThree)
+    XCTAssertTrue(evictedEntry.isEmpty)
   }
   
-  func testPerformanceExample() {
-    // This is an example of a performance test case.
-    self.measure {
-      // Put the code you want to measure the time of here.
-    }
+  func testPutEntryTwice() {
+    let testCacheSize = 10
+    let testKey = "test_key"
+    let testEntry = parseRawAllocations(raw: rawAllocation)
+    
+    let cache = LRUCache(testCacheSize)
+    cache.putEntry(testKey, val: testEntry)
+    cache.putEntry(testKey, val: testEntry)
+    let entry = cache.getEntry(testKey)
+    
+    XCTAssertNotNil(entry)
+    XCTAssertFalse(entry.isEmpty)
+    XCTAssertEqual(testEntry, entry)
   }
   
 }
