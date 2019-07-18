@@ -38,23 +38,23 @@ public class EvolvConfig {
     return ConfigBuilder(environmentId: environmentId, httpClient: httpClient)
   }
   
-  public func getHttpScheme() -> String { return httpScheme }
+  public func getHttpScheme() -> String { return self.httpScheme }
   
-  public func getDomain() -> String { return domain }
+  public func getDomain() -> String { return self.domain }
   
-  public func getVersion() -> String { return version }
+  public func getVersion() -> String { return self.version }
   
-  public func getEnvironmentId() -> String { return environmentId }
+  public func getEnvironmentId() -> String { return self.environmentId }
   
   public func getEvolvAllocationStore() -> AllocationStoreProtocol {
-    return evolvAllocationStore
+    return self.evolvAllocationStore
   }
   
   public func getHttpClient() -> HttpProtocol {
     return self.httpClient
   }
   
-  public func getExecutionQueue() -> ExecutionQueue { return executionQueue }
+  public func getExecutionQueue() -> ExecutionQueue { return self.executionQueue }
 }
 
 

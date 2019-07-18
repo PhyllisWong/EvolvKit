@@ -22,7 +22,7 @@ class AllocatorTest: XCTestCase {
   private var mockAllocationStore : AllocationStoreProtocol!
   
   override func setUp() {
-    mockExecutionQueue = ExecutionQueueMock()
+    mockExecutionQueue = ExecutionQueue()
     mockHttpClient = HttpClientMock()
     mockAllocationStore = DefaultAllocationStore(size: 1)
     mockConfig = ConfigMock("https", "test_domain", "test_v", "test_eid", mockAllocationStore, mockHttpClient)
@@ -231,37 +231,41 @@ class AllocatorTest: XCTestCase {
     XCTAssertEqual([JSON](), actualAllocations)
   }
   
-  func testFetchAllocationsWithNoAllocationsInStore() -> Void {
-    var allocationsResponsePromise = String()
-    allocationsResponsePromise = rawAllocation
+  func testFetchAllocationsWithNoAllocationsInStore() {
     let participant = EvolvParticipant.builder().build()
-    let allocations = parseRawAllocations(raw: rawAllocation)
-    
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
-    
-    let exp = expectation(description: "Client get allocations, none in store")
-    mockHttpClient.get(url: createAllocationsUrl(config: actualConfig, participant: participant))
-    exp.fulfill()
-    waitForExpectations(timeout: 3)
-    
-    let exp2 = expectation(description: "Allocation store get")
-    _ = mockAllocationStore.get(uid: participant.getUserId())
-    exp2.fulfill()
-    waitForExpectations(timeout: 3)
-    
-    let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
+    let rawAllocations = parseRawAllocations(raw: rawAllocation)
+    let allocationsEmpty = mockAllocationStore.get(uid: participant.getUserId())
+    var allocationsPromiseResolved = [JSON]()
     let allocator = Allocator(config: mockConfig, participant: participant)
-    
     let allocationsPromise = allocator.fetchAllocations()
     
-    // TODO: resolve promise and wait for it to complete before moving on in the test
-    try! allocationsPromise.done { (response) in
-      let status = allocator.getAllocationStatus()
-    }.wait()
-    XCTAssertEqual(exp.expectedFulfillmentCount, 1)
-    XCTAssertEqual(exp2.expectedFulfillmentCount, 1)
-    XCTAssertEqual(Allocator.AllocationStatus.RETRIEVED, allocator.getAllocationStatus())
+
+    XCTAssertNotNil(allocationsPromise)
+    XCTAssertNotEqual(rawAllocations, allocationsEmpty)
+    XCTAssertEqual(allocationsEmpty, [JSON]())
   }
   
-  func testFetchAllocationsWithAReconciliation() -> Void {}
+  func testAllocationsReconciliation() -> Void {
+    let participant = EvolvParticipant.builder().build()
+    let allocations = parseRawAllocations(raw: rawAllocation)
+    let allocationsJson = parseRawAllocations(raw: rawAllocation)
+    mockAllocationStore.set(uid: participant.getUserId(), allocations: allocationsJson)
+    
+    let previous = mockAllocationStore.get(uid: participant.getUserId())
+    let reconciled = Allocations.reconcileAllocations(previousAllocations: previous,
+                                    currentAllocations: allocations)
+    
+    XCTAssertEqual(allocations, reconciled)
+  }
+  
+  func testAllocationsNotEmptyFunction() {
+    let participant = EvolvParticipant.builder().build()
+    let emptyAllocations = mockAllocationStore.get(uid: participant.getUserId())
+    let allocations = parseRawAllocations(raw: rawAllocation)
+    
+    XCTAssertNotNil(emptyAllocations)
+    XCTAssertTrue(emptyAllocations == [JSON]())
+    XCTAssertTrue(allocations != [JSON]())
+    XCTAssertFalse(emptyAllocations == allocations)
+  }
 }

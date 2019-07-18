@@ -17,6 +17,7 @@
 		36E7CFED22DE7D3900027778 /* AllocatorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E7CFEC22DE7D3900027778 /* AllocatorTest.swift */; };
 		36E7CFF122DE7EB200027778 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E7CFF022DE7EB200027778 /* Mocks.swift */; };
 		36E7CFF322DEA52800027778 /* DefaultAllocatorStoreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E7CFF222DEA52800027778 /* DefaultAllocatorStoreTest.swift */; };
+		36E7CFF522DFE0F500027778 /* ExecutionQueueTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E7CFF422DFE0F500027778 /* ExecutionQueueTest.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
@@ -51,6 +52,7 @@
 		36E7CFEC22DE7D3900027778 /* AllocatorTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllocatorTest.swift; sourceTree = "<group>"; };
 		36E7CFF022DE7EB200027778 /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
 		36E7CFF222DEA52800027778 /* DefaultAllocatorStoreTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAllocatorStoreTest.swift; sourceTree = "<group>"; };
+		36E7CFF422DFE0F500027778 /* ExecutionQueueTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionQueueTest.swift; sourceTree = "<group>"; };
 		413BC629A0E194040DAF3DD5 /* Pods-EvolvKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EvolvKit_Tests.debug.xcconfig"; path = "Target Support Files/Pods-EvolvKit_Tests/Pods-EvolvKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		58F36903B855067B2028D671 /* Pods_EvolvKit_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EvolvKit_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD01AFB9204008FA782 /* EvolvKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EvolvKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -154,6 +156,7 @@
 		607FACE81AFB9204008FA782 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				36E7CFF422DFE0F500027778 /* ExecutionQueueTest.swift */,
 				36E7CFF222DEA52800027778 /* DefaultAllocatorStoreTest.swift */,
 				36E7CFF022DE7EB200027778 /* Mocks.swift */,
 				36E7CFEC22DE7D3900027778 /* AllocatorTest.swift */,
@@ -387,6 +390,7 @@
 			files = (
 				607FACEC1AFB9204008FA782 /* EvolvParticipantTest.swift in Sources */,
 				36E7CFE722DE3D2800027778 /* ClientImplTest.swift in Sources */,
+				36E7CFF522DFE0F500027778 /* ExecutionQueueTest.swift in Sources */,
 				36E7CFE922DE5A2F00027778 /* EvolvConfigTest.swift in Sources */,
 				36E7CFED22DE7D3900027778 /* AllocatorTest.swift in Sources */,
 				36E7CFF122DE7EB200027778 /* Mocks.swift in Sources */,

@@ -107,18 +107,30 @@ class HttpClientMock: HttpProtocol {
   }
 }
 
-class ExecutionMock<T>: Execution<T> {
+class ExecutionQueueMock : ExecutionQueue {
   
-  override func executeWithDefault() {
-    
+  var executeAllWithValuesFromAllocationsWasCalled = false
+  var executeAllWithValuesFromDefaultsWasCalled = false
+  
+  override func executeAllWithValuesFromAllocations(allocations: [JSON]) {
+    self.count -= 1
+    executeAllWithValuesFromAllocationsWasCalled = true
   }
   
-  override func executeWithAllocation(rawAllocations: [JSON]) throws {
-    
+  override func executeAllWithValuesFromDefaults() {
+    self.count -= 1
+    executeAllWithValuesFromDefaultsWasCalled = true
   }
 }
 
-class ExecutionQueueMock : ExecutionQueue { }
+class ExecutionMock<T>: Execution<T> {
+  
+  override func executeWithDefault() {}
+  
+  override func executeWithAllocation(rawAllocations: [JSON]) throws {}
+}
+
+
 
 class ConfigMock: EvolvConfig { }
 
