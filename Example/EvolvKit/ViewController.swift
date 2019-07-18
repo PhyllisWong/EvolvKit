@@ -16,19 +16,19 @@ class ViewController: UIViewController {
   @IBOutlet weak var textLabel: UILabel!
   @IBOutlet weak var checkoutButton: UIButton!
   
-  let store : AllocationStoreProtocol
-  var allocations = [JSON]()
-  var client : EvolvClientProtocol
-  var httpClient: HttpProtocol
-  let LOGGER = Log.logger
+//  let store : AllocationStoreProtocol
+//  var allocations = [JSON]()
+//  var client : EvolvClientProtocol
+//  var httpClient: HttpProtocol
+//  let LOGGER = Log.logger
   
   @IBAction func didPressCheckOut(_ sender: Any) {
     //client.emitEvent(key: "conversion")
-    self.textLabel.text = "Conversion!"
+    //self.textLabel.text = "Conversion!"
   }
   
   @IBAction func didPressProductInfo(_ sender: Any) {
-    self.textLabel.text = "Some really cool product info!"
+    //self.textLabel.text = "Some really cool product info!"
   }
   
   // FIXME: Migrate setup to app delegate
@@ -43,30 +43,30 @@ class ViewController: UIViewController {
     let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"option_1\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"오늘추천\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
     // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_3\",\"buttons\":{\"checkout\":{\"text\":\"option_3\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
     // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_7\",\"buttons\":{\"checkout\":{\"text\":\"option_7\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
-    store = CustomAllocationStore()
+    //store = CustomAllocationStore()
     
     if let dataFromString = myStoredAllocation.data(using: String.Encoding.utf8, allowLossyConversion: false) {
       do {
-        self.allocations = try JSON(data: dataFromString).arrayValue
-        store.set(uid: "sandbox_user", allocations: self.allocations)
+        //self.allocations = try JSON(data: dataFromString).arrayValue
+        //store.put(uid: "sandbox_user", allocations: self.allocations)
       } catch {
         let message = "Error converting string json to SwiftyJSON"
-        LOGGER.log(.error, message: message)
+        //LOGGER.log(.error, message: message)
       }
     }
     
-    httpClient = EvolvHttpClient()
+    //httpClient = EvolvHttpClient()
     
     /// - Build config with custom timeout and custom allocation store
     // set client to use sandbox environment
-    let config = EvolvConfig.builder(environmentId: "sandbox", httpClient: httpClient)
-      .setEvolvAllocationStore(allocationStore: store)
-      .build()
+//    let config = EvolvConfig.builder(environmentId: "sandbox", httpClient: httpClient)
+//      .setEvolvAllocationStore(allocationStore: store)
+//      .build()
     
     /// - Initialize the client with a stored user
     /// fetches allocations from Evolv, and stores them in a custom store
-    client = EvolvClientFactory(config: config, participant: EvolvParticipant.builder()
-      .setUserId(userId: "sandbox_user").build()).client as! EvolvClientImpl
+//    client = EvolvClientFactory(config: config, participant: EvolvParticipant.builder()
+//      .setUserId(userId: "sandbox_user").build()).client as! EvolvClientImpl
     
     /// - Initialize the client with a new user
     /// - Uncomment this line if you prefer this initialization.
@@ -84,7 +84,7 @@ class ViewController: UIViewController {
     
     //client.subscribe(key: "ui.layout", defaultValue: "#000000", function: setContentViewWith)
     
-    client.subscribe(key: "ui.buttons.checkout.text", defaultValue: "오늘의추천", function: changeButtonText)
+    //client.subscribe(key: "ui.buttons.checkout.text", defaultValue: "오늘의추천", function: changeButtonText)
     //client.confirm()
     
   }
