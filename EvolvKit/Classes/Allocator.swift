@@ -78,8 +78,8 @@ public class Allocator {
                                                          currentAllocations: allocations)
         }
         
-        
-        self.store.set(uid: self.participant.getUserId(), allocations: allocations)
+
+        self.store.put(uid: self.participant.getUserId(), allocations: allocations)
         self.allocationStatus = AllocationStatus.RETRIEVED
         
         if (self.confirmationSandbagged) {

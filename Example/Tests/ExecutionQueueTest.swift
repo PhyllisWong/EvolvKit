@@ -47,8 +47,7 @@ class ExecutionQueueTest: XCTestCase {
     }
     return allocations
   }
-  
-  
+
   // Mock executions for the execution queue
   func printSomething<T>(value: T) { print("some value: \(value)") }
   func doSomething(key: String) -> () { print("Did something with \(key)!") }
@@ -101,6 +100,7 @@ class ExecutionQueueTest: XCTestCase {
     
     XCTAssertEqual(mockExecutionQueue.count, 2)
     
+    // Should pop an execution from the queue
     mockExecutionQueue.executeAllWithValuesFromDefaults()
 
     XCTAssertEqual(mockExecutionQueue.count, 1)
