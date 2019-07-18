@@ -25,7 +25,7 @@ class DefaultAllocatorStoreTest: XCTestCase {
   func testSetAndGetOnStore() {
     let store = DefaultAllocationStore(size: 10)
     let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
-    store.set(uid: "test_user", allocations: allocations)
+    store.put(uid: "test_user", allocations: allocations)
     let storedAllocations = store.get(uid: "test_user")
     
     XCTAssertNotNil(storedAllocations)

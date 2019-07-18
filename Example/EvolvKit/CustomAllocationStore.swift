@@ -27,7 +27,7 @@ public class CustomAllocationStore: AllocationStoreProtocol {
     return allocations[uid] ?? [JSON]()
   }
   
-  public func set(uid: String, allocations: [JSON]) {
+  public func put(uid: String, allocations: [JSON]) {
     self.allocations.updateValue(allocations, forKey: uid)
   }
   

@@ -10,18 +10,19 @@ import SwiftyJSON
 
 public class LRUCache {
   
-  static var maxSize: Int = 10
+  private let maxSize: Int
   private var cache: [String: [JSON]] = [:]
   private var priority: LinkedList<String> = LinkedList<String>()
   private var key2node: [String: LinkedList<String>.LinkedListNode<String>] = [:]
   
-  static let share = LRUCache(maxSize)
-  public init(_ maxSize: Int = 10) {
+  
+  public init(_ maxSize: Int) {
+    self.maxSize = maxSize
   }
   
-  public func get(_ key: String) -> [JSON]? {
+  public func getEntry(_ key: String) -> [JSON] {
     guard let val = cache[key] else {
-      return nil
+      return [JSON]()
     }
     
     remove(key)
@@ -30,10 +31,10 @@ public class LRUCache {
     return val
   }
   
-  public func set(_ key: String, val: [JSON]) {
+  public func putEntry(_ key: String, val: [JSON]) {
     if cache[key] != nil {
       remove(key)
-    } else if priority.count >= LRUCache.maxSize, let keyToRemove = priority.last?.value {
+    } else if priority.count >= self.maxSize, let keyToRemove = priority.last?.value {
       remove(keyToRemove)
     }
     
