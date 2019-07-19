@@ -11,16 +11,16 @@ import SwiftyJSON
 import PromiseKit
 @testable import EvolvKit
 
-class EvolvClientTest: XCTestCase {
+class ClientFactoryTest: XCTestCase {
   
   private let environmentId: String = "test_12345"
   private let rawAllocation: String = "[{\"uid\":\"test_uid\",\"sid\":\"test_sid\",\"eid\":\"test_eid\",\"cid\":\"test_cid\",\"genome\":{\"search\":{\"weighting\":{\"distance\":2.5,\"dealer_score\":2.5}},\"pages\":{\"all_pages\":{\"header_footer\":[\"blue\",\"white\"]},\"testing_page\":{\"megatron\":\"none\",\"header\":\"white\"}},\"algorithms\":{\"feature_importance\":false}},\"excluded\":false}]"
 
   
-  private var mockHttpClient : HttpClientMock!
-  private var mockAllocationStore : AllocationStoreMock!
-  private var mockExecutionQueue : ExecutionQueueMock!
-  private var mockConfig : ConfigMock!
+  private var mockHttpClient : HttpProtocol!
+  private var mockAllocationStore : AllocationStoreProtocol!
+  private var mockExecutionQueue : ExecutionQueue!
+  private var mockConfig : EvolvConfig!
   
     override func setUp() {
       mockHttpClient = HttpClientMock()
@@ -50,17 +50,31 @@ class EvolvClientTest: XCTestCase {
     components.host = config.getDomain()
     components.path = "/\(config.getVersion())/\(config.getEnvironmentId())/allocations"
     components.queryItems = [
-      URLQueryItem(name: "uid", value: "\(participant.getUserId())")
+      URLQueryItem(name: "uid", value: "\(participant.getUserId())"),
+      URLQueryItem(name: "sid", value: "\(participant.getSessionId())")
     ]
-    
-    guard let url = components.url else { return URL(string: "")! }
-    return url
+    return components.url!
   }
 
   func testClientInit() {
     let actualConfig = EvolvConfig.builder(environmentId: environmentId,
                                            httpClient: mockHttpClient).build()
-    // let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(mockConfig, actualConfig, mockExecutionQueue, mockHttp, mockAllocationStore)
+    let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
+                                                                            mockExecutionQueue, mockHttpClient,
+                                                                            mockAllocationStore)
+    var responsePromise = mockHttpClient.get(url: URL(string: anyString(length: 12))!)
+    responsePromise = Promise.value(rawAllocation)
+    XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
+    
+    let _ = mockHttpClient.get(url: URL(string: anyString(length: 12))!)
+    let client = EvolvClientFactory.init(config: mockConfig)
+    
+    XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
+    XCTAssertTrue(type(of: client) == EvolvClientProtocol.self)
   }
 
+  fileprivate func anyString(length: Int) -> String {
+    let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return String((0..<length).map{ _ in letters.randomElement()! })
+  }
 }
