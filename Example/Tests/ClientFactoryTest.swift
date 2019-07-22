@@ -64,17 +64,32 @@ class ClientFactoryTest: XCTestCase {
                                                                             mockAllocationStore)
     var responsePromise = mockHttpClient.get(url: URL(string: anyString(length: 12))!)
     responsePromise = Promise.value(rawAllocation)
-    XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
-    
-    let _ = mockHttpClient.get(url: URL(string: anyString(length: 12))!)
-    let client = EvolvClientFactory.init(config: mockConfig)
     
     XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
-    XCTAssertTrue(type(of: client) == EvolvClientProtocol.self)
+    
+    let client = EvolvClientFactory(config: mockConfig)
+    XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
   }
 
   fileprivate func anyString(length: Int) -> String {
     let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return String((0..<length).map{ _ in letters.randomElement()! })
+  }
+  
+  func testClientInitSameUser() {
+    let participant = EvolvParticipant.builder().setUserId(userId: "test_uid").build()
+    var mockClient = HttpClientMock()
+    
+    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(mockConfig, actualConfig,
+                                                                             mockExecutionQueue, mockClient, mockAllocationStore)
+    
+    let previousAllocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let previousUid = previousAllocations[0]["uid"].rawString()
+    // when(mockAllocationStore.get(participant.getUserId())).thenReturn(previousAllocations)
+    
+    let client = EvolvClientFactory(config: mockConfig, participant: participant)
+    // verify(mockAllocationStore, times(2)).get(participant.getUserId())
+    // Assert.assertTrue(client instanceof AscendClient)
   }
 }
