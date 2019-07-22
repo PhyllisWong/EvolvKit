@@ -26,7 +26,7 @@ class AllocationStoreMock: AllocationStoreProtocol {
   var expectPutExpectation : XCTestExpectation?
   
   private var mockedGet: (String) -> [JSON] = { _ in
-    XCTFail("unexpected call to get")
+    // XCTFail("unexpected call to set")
     return []
   }
   
@@ -61,12 +61,16 @@ class AllocationStoreMock: AllocationStoreProtocol {
   }
 }
 
+class ClientFactoryMock : EvolvClientFactory {
+  
+}
 
 class HttpClientMock: HttpProtocol {
   public static var httpClientSendEventsWasCalled = false
   
   @discardableResult
   func get(url: URL) -> Promise<String> {
+    HttpClientMock.httpClientSendEventsWasCalled = true
     return Promise<String> { resolver -> Void in
       
       Alamofire.request(url)
