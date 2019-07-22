@@ -5,36 +5,57 @@ import PromiseKit
 
 class ClientImplTest: XCTestCase {
   
-  var allocationStoreMock: AllocationStoreMock!
-  var httpClientMock : HttpClientMock!
+  var mockConfig : EvolvConfig!
+  var mockExecutionQueue : ExecutionQueue!
+  var mockHttpClient : HttpClientMock!
+  var mockAllocationStore: AllocationStoreMock!
+  var mockEventEmitter : EventEmitter!
+  var mockAllocator : Allocator!
+  
+  private let participant = EvolvParticipant(userId: "test_user", sessionId: "test_session", userAttributes: [
+    "userId": "test_user",
+    "sessionId": "test_session"
+    ])
+  
+  private let environmentId = "test_env"
+  private let rawAllocation = "[{\"uid\":\"test_uid\",\"sid\":\"test_sid\",\"eid\":\"test_eid\",\"cid\":\"test_cid\",\"genome\":{\"search\":{\"weighting\":{\"distance\":2.5,\"dealer_score\":2.5}},\"pages\":{\"all_pages\":{\"header_footer\":[\"blue\",\"white\"]},\"testing_page\":{\"megatron\":\"none\",\"header\":\"white\"}},\"algorithms\":{\"feature_importance\":false}},\"excluded\":false}]"
+  private let testValue: Double = 0.0
   
   override func setUp() {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
-    self.allocationStoreMock = AllocationStoreMock(testCase: self)
-    self.httpClientMock = HttpClientMock()
+    self.mockHttpClient = HttpClientMock()
+    self.mockAllocationStore = AllocationStoreMock(testCase: self)
+    self.mockConfig = EvolvConfig("https", "test.evolv.ai", "v1", self.environmentId, self.mockAllocationStore, self.mockHttpClient)
+    self.mockExecutionQueue = ExecutionQueueMock()
+    self.mockEventEmitter = EventEmitter(config: self.mockConfig, participant: self.participant)
+    self.mockAllocator = Allocator(config: self.mockConfig, participant: self.participant)
   }
   
   override func tearDown() {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-  }
-  
-  func testExample() {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
-  }
-  
-  func testPerformanceExample() {
-    // This is an example of a performance test case.
-    self.measure {
-      // Put the code you want to measure the time of here.
+    if let _ = mockHttpClient {
+      mockHttpClient = nil
+    }
+    if let _ = mockConfig {
+      mockConfig = nil
+    }
+    if let _ = mockAllocationStore {
+      mockAllocationStore = nil
+    }
+    if let _ = mockExecutionQueue {
+      mockExecutionQueue = nil
+    }
+    if let _ = mockEventEmitter {
+      mockEventEmitter = nil
+    }
+    if let _ = mockAllocator {
+      mockAllocator = nil
     }
   }
-  func testSubscribe_AllocationStoreIsEmpty_SubscriptionKeyIsValid_() {
+  
+  func testGetReturnsDefaultsUponNullFuture() {
     let subscriptionKey = "foo.bar"
     let defaultValue = "FooBar"
     let applyFunction: (String) -> Void = { value in
       
-      // XCTAssertEqual(<#T##expression1: Equatable##Equatable#>, <#T##expression2: Equatable##Equatable#>)
     }
     
     let participantId = "id"
@@ -44,13 +65,13 @@ class ClientImplTest: XCTestCase {
       "sessionId": "sid"
       ])
     
-    self.allocationStoreMock.expectGet { uid -> [JSON] in
+    self.mockAllocationStore.expectGet { uid -> [JSON] in
       XCTAssertEqual(uid, participantId)
       
       return [JSON]()
     }
     
-    let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.allocationStoreMock, self.httpClientMock)
+    let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.mockAllocationStore, self.mockHttpClient)
     let emitter = EventEmitter(config: config, participant: participant)
     let promise = Promise<[JSON]>.pending().promise
     let allocator = Allocator(config: config, participant: participant)
@@ -75,7 +96,7 @@ class ClientImplTest: XCTestCase {
       "sessionId": "sid"
       ])
     
-    self.allocationStoreMock.expectGet { uid -> [JSON] in
+    self.mockAllocationStore.expectGet { uid -> [JSON] in
       XCTAssertEqual(uid, participantId)
       
       let myStoredAllocation = "[{\"uid\":\"\(participantId)\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"Begin Secure Checkout\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
@@ -86,7 +107,7 @@ class ClientImplTest: XCTestCase {
     }
     
     
-    let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.allocationStoreMock, self.httpClientMock)
+    let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.mockAllocationStore, self.mockHttpClient)
     let emitter = EventEmitter(config: config, participant: participant)
     let promise = Promise<[JSON]>.pending().promise
     let allocator = Allocator(config: config, participant: participant)

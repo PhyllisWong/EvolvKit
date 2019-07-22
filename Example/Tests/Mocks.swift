@@ -26,7 +26,7 @@ class AllocationStoreMock: AllocationStoreProtocol {
   var expectPutExpectation : XCTestExpectation?
   
   private var mockedGet: (String) -> [JSON] = { _ in
-    XCTFail("unexpected call to get")
+    // XCTFail("unexpected call to set")
     return []
   }
   
@@ -61,10 +61,16 @@ class AllocationStoreMock: AllocationStoreProtocol {
   }
 }
 
+class ClientFactoryMock : EvolvClientFactory {
+  
+}
 
 class HttpClientMock: HttpProtocol {
+  public static var httpClientSendEventsWasCalled = false
+  
   @discardableResult
   func get(url: URL) -> Promise<String> {
+    HttpClientMock.httpClientSendEventsWasCalled = true
     return Promise<String> { resolver -> Void in
       
       Alamofire.request(url)
@@ -86,6 +92,7 @@ class HttpClientMock: HttpProtocol {
   }
   
   func sendEvents(url: URL) {
+    HttpClientMock.httpClientSendEventsWasCalled = true
     let headers = [
       "Content-Type": "application/json",
       "Host" : "participants.evolv.ai"
@@ -105,6 +112,41 @@ class HttpClientMock: HttpProtocol {
                         }
     }
   }
+}
+
+class EmitterMock : EventEmitter {
+  
+  let httpClientMock = HttpClientMock()
+  
+  override func sendAllocationEvents(_ key: String, _ allocations: [JSON]) {
+    let eid = allocations[0]["eid"].rawString()!
+    let cid = allocations[0]["cid"].rawString()!
+    let url = createEventUrl(type: key, experimentId: eid, candidateId: cid)
+    makeEventRequest(url)
+  }
+  
+  private func makeEventRequest(_ url: URL) -> Void {
+    let _ = httpClientMock.sendEvents(url: url)
+  }
+  
+  override public func contaminate(allocations: [JSON]) -> Void {
+    self.sendAllocationEvents(CONTAMINATE_KEY, allocations)
+  }
+  
+  override public func confirm(allocations: [JSON]) -> Void {
+    self.sendAllocationEvents(CONFIRM_KEY, allocations)
+  }
+  
+  override public func emit(_ key: String) -> Void {
+    let url: URL = createEventUrl(type: key, score: 1.0)
+    self.makeEventRequest(url)
+  }
+  
+  override public func emit(_ key: String, _ score: Double) -> Void {
+    let url: URL = createEventUrl(type: key, score: score)
+    self.makeEventRequest(url)
+  }
+  
 }
 
 class ExecutionQueueMock : ExecutionQueue {

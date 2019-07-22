@@ -43,14 +43,6 @@ class AllocatorTest: XCTestCase {
     }
   }
   
-  func parseRawAllocations(raw: String) -> [JSON] {
-    var allocations = [JSON]()
-    if let dataFromString = raw.data(using: String.Encoding.utf8, allowLossyConversion: false) {
-      allocations = try! JSON(data: dataFromString).arrayValue
-    }
-    return allocations
-  }
-  
   func setUpMockedEvolvConfigWithMockedClient(_ mockedConfig: EvolvConfig, _ actualConfig: EvolvConfig,
                                               _ mockExecutionQueue: ExecutionQueue, _ mockHttpClient: HttpProtocol,
                                               _ mockAllocationStore: AllocationStoreProtocol) -> EvolvConfig {
@@ -125,7 +117,7 @@ class AllocatorTest: XCTestCase {
   func testAllocationsNotEmpty() {
     let nilAllocations: [JSON]? = nil
     let emptyAllocations = [JSON]()
-    let allocations = parseRawAllocations(raw: rawAllocation)
+    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
     
     XCTAssertFalse(Allocator.allocationsNotEmpty(allocations: nilAllocations))
     XCTAssertFalse(Allocator.allocationsNotEmpty(allocations: emptyAllocations))
@@ -135,7 +127,7 @@ class AllocatorTest: XCTestCase {
   func testResolveAllocationFailureWithAllocationsInStore() -> Void {
     let participant = EvolvParticipant.builder().build()
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
-    let allocations = parseRawAllocations(raw: rawAllocation)
+    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
 
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
     
@@ -157,7 +149,8 @@ class AllocatorTest: XCTestCase {
   func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedConfirmation() -> Void {
     let participant = EvolvParticipant.builder().build()
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
-    let allocations = parseRawAllocations(raw: rawAllocation)
+    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+
 
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
     
@@ -187,7 +180,7 @@ class AllocatorTest: XCTestCase {
   func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedContamination() -> Void {
     let participant = EvolvParticipant.builder().build()
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
-    let allocations = parseRawAllocations(raw: rawAllocation)
+    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
 
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
     
@@ -236,7 +229,7 @@ class AllocatorTest: XCTestCase {
   
   func testFetchAllocationsWithNoAllocationsInStore() {
     let participant = EvolvParticipant.builder().build()
-    let rawAllocations = parseRawAllocations(raw: rawAllocation)
+    let rawAllocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
     let allocationsEmpty = mockAllocationStore.get(uid: participant.getUserId())
     var allocationsPromiseResolved = [JSON]()
     let allocator = Allocator(config: mockConfig, participant: participant)
@@ -250,8 +243,8 @@ class AllocatorTest: XCTestCase {
   
   func testAllocationsReconciliation() -> Void {
     let participant = EvolvParticipant.builder().build()
-    let allocations = parseRawAllocations(raw: rawAllocation)
-    let allocationsJson = parseRawAllocations(raw: rawAllocation)
+    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocationsJson = AllocationsTest().parseRawAllocations(raw: rawAllocation)
 
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocationsJson)
     
@@ -265,7 +258,7 @@ class AllocatorTest: XCTestCase {
   func testAllocationsNotEmptyFunction() {
     let participant = EvolvParticipant.builder().build()
     let emptyAllocations = mockAllocationStore.get(uid: participant.getUserId())
-    let allocations = parseRawAllocations(raw: rawAllocation)
+    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
     
     XCTAssertNotNil(emptyAllocations)
     XCTAssertTrue(emptyAllocations == [JSON]())

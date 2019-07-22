@@ -37,12 +37,14 @@ class ViewController: UIViewController {
      When you receive the fetched json from the participants API, it will be as type String.
      If you use the EvolvHttpClient, the json will be parsed with SwiftyJSON (required data type for our implementation of the cache.
      This example shows how the data can be structured, your implementation can work directly with the raw String and serialize into Swift if you choose.
-     Uncomment each storedAllocation one at a time to see the UI change based on the allocation.
+     Uncomment each option one at a time to see the UI change based on the allocation.
      */
-    
-    let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"option_1\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"오늘추천\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
-    // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_3\",\"buttons\":{\"checkout\":{\"text\":\"option_3\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
-    // let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_7\",\"buttons\":{\"checkout\":{\"text\":\"option_7\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"Product Specifications\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
+
+    let option1 = "option_1"
+    //let option3 = "option_3"
+    //let option7 = "option_7"
+    let myStoredAllocation = "[{\"uid\":\"sandbox_user\",\"eid\":\"experiment_1\",\"cid\":\"candidate_3\",\"genome\":{\"ui\":{\"layout\":\"option_1\",\"buttons\":{\"checkout\":{\"text\":\"\(option1)\",\"color\":\"#f3b36d\"},\"info\":{\"text\":\"오늘추천\",\"color\":\"#f3b36d\"}}},\"search\":{\"weighting\":3.5}},\"excluded\":true}]"
+
     // store = CustomAllocationStore()
     
     if let dataFromString = myStoredAllocation.data(using: String.Encoding.utf8, allowLossyConversion: false) {
