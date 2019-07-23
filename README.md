@@ -16,17 +16,37 @@ sudo gem install cocoapods
 ## Installation
 
 EvolvKit is available through [CocoaPods](https://cocoapods.org/pods/EvolvKit). To install
-it, simply add the following line to your Podfile:
+it, navigate to the root directory of your project.  Type this command in your terminal to create the Podfile:
+
+```bash
+pod init
+```
+
+or you can create the file yourself. Ensure you do not add any extensions.
+
+Open your Podfile in xcode via the finder, and add the following line to your Podfile:
 
 ```ruby
 pod 'EvolvKit'
+```
+
+Example Podfile contents:
+
+```
+platform :ios, '9.0'
+use_frameworks!
+
+target 'EvolvKit_Example' do
+  pod 'EvolvKit'
+
+end
 ```
 
 ## License
 
 EvolvKit is available under the Apache License, Version 2.0. See the LICENSE file for more info.
 
-## How to use the EvolvKit SDK
+## How to use the EvolvKit
 
 #### Vocabulary
 
@@ -52,9 +72,9 @@ let participant = EvolvParticipant.builder().build()
 or 
 
 let participant = EvolvParticipant.builder()
-.setUserId(userId: <custom_id>).build()
+  .setUserId(userId: <custom_id>).build()
 ```
-*Note: If you do not set the participant's userId, the builder will create a unique id for you.*
+*Note: the builder will create a unique id for you, unless you choose to set the participant's userId .*
 
 
 ### Client Initialization
@@ -138,7 +158,7 @@ let client = EvolvClientImpl(<config>, <eventEmitter>, <futureAllocations>, <pre
 or
 
 let client = EvolvClientFactory(config: config, participant: EvolvParticipant.builder()
-      .setUserId(userId: "sandbox_user").build()).client as! EvolvClientImpl
+  .setUserId(userId: "sandbox_user").build()).client as! EvolvClientImpl
 ```
 
 
