@@ -151,7 +151,6 @@ class AllocatorTest: XCTestCase {
     let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
     let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
 
-
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
     
     let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
