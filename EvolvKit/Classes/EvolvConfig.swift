@@ -34,8 +34,8 @@ public class EvolvConfig {
     self.httpClient = httpClient
   }
   
-  static public func builder(environmentId: String, httpClient: HttpProtocol) -> ConfigBuilder {
-    return ConfigBuilder(environmentId: environmentId, httpClient: httpClient)
+  static public func builder(_ environmentId: String, _ httpClient: HttpProtocol) -> ConfigBuilder {
+    return ConfigBuilder(environmentId, httpClient)
   }
   
   public func getHttpScheme() -> String { return self.httpScheme }
@@ -82,8 +82,8 @@ public class ConfigBuilder {
       - allocationStore: You may pass in any LruCache of your choice, defaults to EvolvAllocationStore.
    */
   
-  fileprivate init(environmentId: String, httpClient: HttpProtocol = EvolvHttpClient(),
-                   allocationStore: AllocationStoreProtocol = DefaultAllocationStore(size: 1000)) {
+  fileprivate init(_ environmentId: String, _ httpClient: HttpProtocol = EvolvHttpClient(),
+                   _ allocationStore: AllocationStoreProtocol = DefaultAllocationStore(size: 1000)) {
     self.environmentId = environmentId
     self.httpClient = httpClient
     self.allocationStore = allocationStore

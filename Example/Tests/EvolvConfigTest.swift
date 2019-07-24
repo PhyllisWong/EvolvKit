@@ -26,7 +26,7 @@ class EvolvConfigTest: XCTestCase {
     }
 
     func testBuildDefaultConfig() {
-      let config = EvolvConfig.builder(environmentId: ENVIRONMENT_ID, httpClient: mockHttpClient).build()
+      let config = EvolvConfig.builder(ENVIRONMENT_ID, mockHttpClient).build()
       
       XCTAssertEqual(ENVIRONMENT_ID, config.getEnvironmentId())
       XCTAssertEqual(EvolvConfig.DEFAULT_HTTP_SCHEME, config.getHttpScheme())
@@ -43,7 +43,7 @@ class EvolvConfigTest: XCTestCase {
       let allocationStore = DefaultAllocationStore(size: 10)
       let httpScheme = "test"
       
-      let config = EvolvConfig.builder(environmentId: ENVIRONMENT_ID, httpClient: mockHttpClient)
+      let config = EvolvConfig.builder(ENVIRONMENT_ID, mockHttpClient)
         .setDomain(domain: domain)
         .setVersion(version: version)
         .setEvolvAllocationStore(allocationStore: allocationStore)

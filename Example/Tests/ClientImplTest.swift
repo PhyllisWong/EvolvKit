@@ -114,7 +114,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testEmitEventWithScore() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -133,7 +133,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testEmitEvent() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -150,7 +150,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testConfirmEventSandBagged() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -170,7 +170,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testConfirmEvent() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -191,7 +191,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testContaminateEventSandBagged() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -210,7 +210,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testContaminateEvent() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -231,7 +231,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testSubscribeNoPreviousAllocationsWithFetchingState() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -259,7 +259,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testSubscribeNoPreviousAllocationsWithRetrievedState() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -289,7 +289,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testSubscribeNoPreviousAllocationsWithFailedState() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
@@ -319,7 +319,7 @@ class ClientImplTest: XCTestCase {
   }
   
   func testSubscribeNoPreviousAllocationsWithRetrievedStateThrowsError() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)

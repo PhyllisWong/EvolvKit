@@ -100,7 +100,7 @@ class AllocatorTest: XCTestCase {
   }
   
   func testCreateAllocationsUrl() {
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                             mockExecutionQueue, mockHttpClient,
                                                             mockAllocationStore)
@@ -124,7 +124,7 @@ class AllocatorTest: XCTestCase {
   
   func testResolveAllocationFailureWithAllocationsInStore() -> Void {
     let participant = EvolvParticipant.builder().build()
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
 
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
@@ -146,7 +146,7 @@ class AllocatorTest: XCTestCase {
   
   func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedConfirmation() -> Void {
     let participant = EvolvParticipant.builder().build()
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
 
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
@@ -176,7 +176,7 @@ class AllocatorTest: XCTestCase {
   
   func testResolveAllocationFailureWithAllocationsInStoreWithSandbaggedContamination() -> Void {
     let participant = EvolvParticipant.builder().build()
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
 
     mockAllocationStore.put(uid: participant.getUserId(), allocations: allocations)
@@ -205,7 +205,7 @@ class AllocatorTest: XCTestCase {
   
   func testResolveAllocationFailureWithNoAllocationsInStore() -> Void {
     let participant = EvolvParticipant.builder().build()
-    let actualConfig = EvolvConfig.builder(environmentId: environmentId, httpClient: mockHttpClient).build()
+    let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let allocations = mockAllocationStore.get(uid: participant.getUserId())
     
     let mockConfig = setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue, mockHttpClient, mockAllocationStore)
