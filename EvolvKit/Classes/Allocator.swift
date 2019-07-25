@@ -29,7 +29,6 @@ public class Allocator {
   private var LOGGER = Log.logger
   private var allocationStatus: AllocationStatus
   
-  
   init(config: EvolvConfig,
        participant: EvolvParticipant) {
     self.executionQueue = config.getExecutionQueue()
@@ -40,7 +39,7 @@ public class Allocator {
     self.allocationStatus = AllocationStatus.FETCHING
     self.eventEmitter = EventEmitter(config: config, participant: participant)
   }
-  
+
   func getAllocationStatus() -> AllocationStatus {
     return allocationStatus
   }
@@ -76,11 +75,10 @@ public class Allocator {
     return Promise { resolve in
       let url = self.createAllocationsUrl()
       
-      let _ = self.httpClient.get(url: url).done { (stringJSON) in
+      _ = self.httpClient.get(url: url).done { (stringJSON) in
         var allocations = JSON.init(parseJSON: stringJSON).arrayValue
         let previous = self.store.get(uid: self.participant.getUserId())
         
-      
         if Allocator.allocationsNotEmpty(allocations: previous) {
           allocations = Allocations.reconcileAllocations(previousAllocations: previous,
                                                          currentAllocations: allocations)
@@ -89,7 +87,7 @@ public class Allocator {
         self.store.put(uid: self.participant.getUserId(), allocations: allocations)
         self.allocationStatus = AllocationStatus.RETRIEVED
         
-        if (self.confirmationSandbagged) {
+        if self.confirmationSandbagged {
           self.eventEmitter.confirm(allocations: allocations)
         }
         
@@ -111,7 +109,6 @@ public class Allocator {
   public func resolveAllocationsFailure() -> [JSON] {
     let previous = self.store.get(uid: self.participant.getUserId())
     
-
     if Allocator.allocationsNotEmpty(allocations: previous) {
       LOGGER.log(.debug, message: "Falling back to participant's previous allocation.")
       
@@ -144,7 +141,6 @@ public class Allocator {
     guard let allocArray = allocations else {
       return false
     }
-    return allocArray.count > 0
+    return allocArray.isEmpty == false
   }
 }
-

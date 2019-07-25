@@ -5,12 +5,12 @@ import PromiseKit
 
 class ClientImplTest: XCTestCase {
   
-  var mockConfig : EvolvConfig!
-  var mockExecutionQueue : ExecutionQueue!
-  var mockHttpClient : HttpClientMock!
+  var mockConfig: EvolvConfig!
+  var mockExecutionQueue: ExecutionQueue!
+  var mockHttpClient: HttpClientMock!
   var mockAllocationStore: AllocationStoreMock!
-  var mockEventEmitter : EventEmitter!
-  var mockAllocator : Allocator!
+  var mockEventEmitter: EventEmitter!
+  var mockAllocator: Allocator!
   
   private let participant = EvolvParticipant(userId: "test_user", sessionId: "test_session", userAttributes: [
     "userId": "test_user",
@@ -18,10 +18,48 @@ class ClientImplTest: XCTestCase {
     ])
   
   private let environmentId = "test_env"
-  private let rawAllocation = "[{\"uid\":\"test_uid\",\"sid\":\"test_sid\",\"eid\":\"test_eid\",\"cid\":\"test_cid\",\"genome\":{\"search\":{\"weighting\":{\"distance\":2.5,\"dealer_score\":2.5}},\"pages\":{\"all_pages\":{\"header_footer\":[\"blue\",\"white\"]},\"testing_page\":{\"megatron\":\"none\",\"header\":\"white\"}},\"algorithms\":{\"feature_importance\":false}},\"excluded\":false}]"
+    private var rawAllocations: [JSON] {
+        let data: [[String: Any]] = [
+            [
+                "uid": "test_uid",
+                "sid": "test_sid",
+                "eid": "test_eid",
+                "cid": "test_cid",
+                "genome": [
+                    "search": [
+                        "weighting": [
+                            "distance": 2.5,
+                            "dealer_score": 2.5
+                        ]
+                    ],
+                    "pages": [
+                        "all_pages": [
+                            "header_footer": [
+                                "blue",
+                                "white"
+                            ]
+                        ],
+                        "testing_page": [
+                            "megatron": "none",
+                            "header": "white"
+                        ]
+                    ],
+                    "algorithms": [
+                        "feature_importance": false
+                    ]
+                ],
+                "excluded": false
+            ]
+        ]
+        
+        return JSON(data).arrayValue
+    }
+
   private var testValue: Double = 0.0
   
   override func setUp() {
+    super.setUp()
+    
     self.mockHttpClient = HttpClientMock()
     self.mockAllocationStore = AllocationStoreMock(testCase: self)
     self.mockConfig = EvolvConfig("https", "test.evolv.ai", "v1", self.environmentId, self.mockAllocationStore, self.mockHttpClient)
@@ -31,22 +69,24 @@ class ClientImplTest: XCTestCase {
   }
   
   override func tearDown() {
-    if let _ = mockHttpClient {
+    super.tearDown()
+    
+    if mockHttpClient != nil {
       mockHttpClient = nil
     }
-    if let _ = mockConfig {
+    if mockConfig != nil {
       mockConfig = nil
     }
-    if let _ = mockAllocationStore {
+    if mockAllocationStore != nil {
       mockAllocationStore = nil
     }
-    if let _ = mockExecutionQueue {
+    if mockExecutionQueue != nil {
       mockExecutionQueue = nil
     }
-    if let _ = mockEventEmitter {
+    if mockEventEmitter != nil {
       mockEventEmitter = nil
     }
-    if let _ = mockAllocator {
+    if mockAllocator != nil {
       mockAllocator = nil
     }
   }
@@ -59,13 +99,13 @@ class ClientImplTest: XCTestCase {
     
     self.mockAllocationStore.expectGet { uid -> [JSON] in
       XCTAssertEqual(uid, self.participant.getUserId())
-      let allocations = AllocationsTest().parseRawAllocations(raw: self.rawAllocation)
+      let allocations = self.rawAllocations
       return allocations
     }
     
     let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.mockAllocationStore, self.mockHttpClient)
     let emitter = EventEmitter(config: config, participant: participant)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
@@ -98,13 +138,13 @@ class ClientImplTest: XCTestCase {
     self.mockAllocationStore.expectGet { uid -> [JSON] in
       XCTAssertEqual(uid, participant.getUserId())
       expectation.fulfill()
-      let allocations = AllocationsTest().parseRawAllocations(raw: self.rawAllocation)
+      let allocations = self.rawAllocations
       return allocations
     }
     
     let config = EvolvConfig("https", "test.evolv.ai", "v1", "test_env", self.mockAllocationStore, self.mockHttpClient)
     let emitter = EventEmitter(config: config, participant: participant)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
@@ -128,7 +168,7 @@ class ClientImplTest: XCTestCase {
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
     
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -146,7 +186,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -166,7 +206,7 @@ class ClientImplTest: XCTestCase {
     
     XCTAssertEqual(mockAllocator.getAllocationStatus(), Allocator.AllocationStatus.FETCHING)
     
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -183,7 +223,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -204,7 +244,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -223,7 +263,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -244,7 +284,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -272,7 +312,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -302,7 +342,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -332,7 +372,7 @@ class ClientImplTest: XCTestCase {
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig,
                                                                             mockExecutionQueue, mockHttpClient,
                                                                             mockAllocationStore)
-    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    let allocations = self.rawAllocations
     let promise = Promise { resolver in
       resolver.fulfill(allocations)
     }
@@ -358,4 +398,3 @@ class ClientImplTest: XCTestCase {
   }
   
 }
-
