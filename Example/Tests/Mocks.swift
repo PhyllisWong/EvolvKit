@@ -14,6 +14,23 @@ import PromiseKit
 
 class Mocks: XCTestCase { }
 
+class AllocationStoreMockWithAllocations: AllocationStoreProtocol {
+  public var cache: LRUCache
+  
+  public init(size: Int) {
+    self.cache = LRUCache(size)
+    let allocationsForMockStore = AllocationsTest().parseRawAllocations(raw: AllocationsTest.rawAllocation)
+    cache.putEntry("test_user", val: allocationsForMockStore)
+  }
+  public func get(uid: String) -> [JSON] {
+    return cache.getEntry(uid)
+  }
+  
+  public func put(uid: String, allocations: [JSON]) {
+    cache.putEntry(uid, val: allocations)
+  }
+}
+
 class AllocationStoreMock: AllocationStoreProtocol {
   
   let testCase: XCTestCase
