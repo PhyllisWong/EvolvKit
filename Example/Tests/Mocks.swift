@@ -17,6 +17,7 @@ class Mocks: XCTestCase { }
 class AllocationStoreMock: AllocationStoreProtocol {
   
   let testCase: XCTestCase
+  var mockedCache = DefaultAllocationStore(size: 10)
   
   init (testCase: XCTestCase) {
     self.testCase = testCase
@@ -32,7 +33,9 @@ class AllocationStoreMock: AllocationStoreProtocol {
   }
   
   private var mockedPut: (String, [JSON]) -> Void = { _,_  in
-    
+    let rawAllocation = AllocationsTest.rawAllocation
+    let allocations = AllocationsTest().parseRawAllocations(raw: rawAllocation)
+    DefaultAllocationStore(size: 10).put(uid: "test_user", allocations: allocations)
   }
   
   
@@ -195,11 +198,16 @@ class EmitterMock : EventEmitter {
     let _ = httpClientMock.sendEvents(url: url)
   }
   
+  /// emitter.contaminate => sendAllocationEvents => makeEventRequest => httpClient.sendEvents()
   override public func contaminate(allocations: [JSON]) -> Void {
+    let testKey = "test_key"
+    sendAllocationEvents(testKey, allocations)
     contaminateWithAllocationsWasCalled = true
   }
   
+  /// emitter.confirm => sendAllocationEvents => makeEventRequest => httpClient.sendEvents()
   override public func confirm(allocations: [JSON]) -> Void {
+    
     confirmWithAllocationsWasCalled = true
   }
   

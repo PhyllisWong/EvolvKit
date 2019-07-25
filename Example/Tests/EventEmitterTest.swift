@@ -137,7 +137,6 @@ class EventEmitterTest: XCTestCase {
     XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
   }
   
-  // FIXME: test failing
   func testContaminateEvent() {
     let actualConfig = EvolvConfig.builder(environmentId, mockHttpClient).build()
     let mockConfig = AllocatorTest().setUpMockedEvolvConfigWithMockedClient(self.mockConfig, actualConfig, mockExecutionQueue,
@@ -147,7 +146,7 @@ class EventEmitterTest: XCTestCase {
     let participant = EvolvParticipant.builder().build()
     let emitter = EmitterMock(config: mockConfig, participant: participant)
     
-    /// contaminate => sendAllocationEvents => makeEventRequest => httpClient.sendEvents()
+    /// emitter.contaminate => sendAllocationEvents => makeEventRequest => httpClient.sendEvents()
     emitter.contaminate(allocations: allocations)
     
     XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
@@ -163,7 +162,7 @@ class EventEmitterTest: XCTestCase {
     let participant = EvolvParticipant.builder().build()
     let emitter = EmitterMock(config: mockConfig, participant: participant)
     
-    /// confirm => sendAllocationEvents => makeEventRequest => httpClient.sendEvents()
+    /// emitter.confirm => sendAllocationEvents => makeEventRequest => httpClient.sendEvents()
     emitter.confirm(allocations: allocations)
     
     XCTAssertTrue(HttpClientMock.httpClientSendEventsWasCalled)
