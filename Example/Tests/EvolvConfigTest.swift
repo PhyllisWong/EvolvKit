@@ -13,7 +13,7 @@ import PromiseKit
 class EvolvConfigTest: XCTestCase {
   
     private let environmentId: String = "test_12345"
-  private var mockHttpClient: HttpProtocol!
+    private var mockHttpClient: HttpProtocol!
 
     override func setUp() {
         super.setUp()
